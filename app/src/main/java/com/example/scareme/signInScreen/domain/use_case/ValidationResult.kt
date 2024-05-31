@@ -1,4 +1,4 @@
-package com.example.scareme.ui.authenticationScreen.domain.use_case
+package com.example.scareme.signInScreen.domain.use_case
 
 
 data class ValidationResult(

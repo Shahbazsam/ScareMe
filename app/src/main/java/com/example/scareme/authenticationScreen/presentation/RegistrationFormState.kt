@@ -1,4 +1,4 @@
-package com.example.scareme.ui.authenticationScreen.presentation
+package com.example.scareme.authenticationScreen.presentation
 
 data class RegistrationFormState(
 

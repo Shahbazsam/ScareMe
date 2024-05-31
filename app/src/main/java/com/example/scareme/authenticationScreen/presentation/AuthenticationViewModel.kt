@@ -1,18 +1,15 @@
-package com.example.scareme.ui.authenticationScreen.presentation
+package com.example.scareme.authenticationScreen.presentation
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.scareme.ui.authenticationScreen.data.AuthRegisterRepository
-import com.example.scareme.ui.authenticationScreen.data.model.UserData
-import com.example.scareme.ui.authenticationScreen.domain.use_case.ValidateEmail
-import com.example.scareme.ui.authenticationScreen.domain.use_case.ValidatePassword
-import com.example.scareme.ui.authenticationScreen.domain.use_case.ValidateRepeatedPassword
+import com.example.scareme.authenticationScreen.data.AuthRegisterRepository
+import com.example.scareme.authenticationScreen.data.model.UserData
+import com.example.scareme.authenticationScreen.domain.use_case.ValidateEmail
+import com.example.scareme.authenticationScreen.domain.use_case.ValidatePassword
+import com.example.scareme.authenticationScreen.domain.use_case.ValidateRepeatedPassword
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch

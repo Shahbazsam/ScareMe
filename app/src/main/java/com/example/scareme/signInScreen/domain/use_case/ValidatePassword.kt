@@ -1,10 +1,8 @@
-package com.example.scareme.ui.authenticationScreen.domain.use_case
-
-import android.util.Patterns
+package com.example.scareme.signInScreen.domain.use_case
 
 class ValidatePassword {
 
-    fun execute(password :String) : ValidationResult{
+    fun execute(password :String) : ValidationResult {
         if(password.length < 8 ){
             return ValidationResult(
                 successful = false,

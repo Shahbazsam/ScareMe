@@ -1,10 +1,10 @@
-package com.example.scareme.ui.authenticationScreen.domain.use_case
+package com.example.scareme.authenticationScreen.domain.use_case
 
 import android.util.Patterns
 
 class ValidateEmail {
 
-    fun execute(email :String) : ValidationResult{
+    fun execute(email :String) : ValidationResult {
         if(email.isBlank()){
             return ValidationResult(
                 successful = false,

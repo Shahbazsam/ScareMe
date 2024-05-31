@@ -1,6 +1,7 @@
-package com.example.scareme.ui.authenticationScreen.data
+package com.example.scareme.signInScreen.data
 
-import com.example.scareme.ui.authenticationScreen.network.AuthApiService
+
+import com.example.scareme.signInScreen.network.SignInApiService
 import retrofit2.converter.gson.GsonConverterFactory
 
 import okhttp3.OkHttpClient
@@ -9,12 +10,12 @@ import okhttp3.OkHttpClient.Builder
 import retrofit2.Retrofit
 
 
-interface AuthAppContainer {
+interface SignInAppContainer {
 
-    val authRegisterRepository : AuthRegisterRepository
+    val signInRepository : SignInRepository
 }
 
-class DefaultContainer : AuthAppContainer {
+class DefaultContainer : SignInAppContainer {
 
     private val baseUrl = "http://itindr.mcenter.pro:8092/api/mobile/v1/"
 
@@ -28,10 +29,10 @@ class DefaultContainer : AuthAppContainer {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val retrofitservice : AuthApiService = retrofit.create(AuthApiService::class.java)
+    val retrofitservice : SignInApiService = retrofit.create(SignInApiService::class.java)
 
-    override val authRegisterRepository: AuthRegisterRepository =
-        NetworkAuthRegisterRepository(retrofitservice)
+    override val signInRepository: SignInRepository =
+        NetworkSignInRepository(retrofitservice)
 
 
 

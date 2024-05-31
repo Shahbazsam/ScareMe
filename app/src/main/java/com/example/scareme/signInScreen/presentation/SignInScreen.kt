@@ -1,4 +1,4 @@
-package com.example.scareme.ui.authenticationScreen.presentation
+package com.example.scareme.signInScreen.presentation
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -14,7 +14,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -31,11 +30,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+
 import com.example.scareme.ui.theme.textColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AuthenticationScreen(modifier: Modifier = Modifier){
+fun SignInScreen(modifier: Modifier = Modifier){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,13 +44,13 @@ fun AuthenticationScreen(modifier: Modifier = Modifier){
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        val viewModel = viewModel<AuthenticationViewModel>()
+        val viewModel = viewModel<SignInViewModel>()
         val state = viewModel.state
         val context = LocalContext.current
         LaunchedEffect(key1 = context) {
             viewModel.validationEvents.collect{event ->
                 when(event){
-                    is AuthenticationViewModel.ValidationEvent.Success ->{
+                    is SignInViewModel.ValidationEvent.Success ->{
                         Toast.makeText(
                             context,
                             "Registration Successful",
@@ -72,7 +72,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier){
             TextField(
                 value = state.email ,
                 onValueChange = {
-                viewModel.onEvent(RegistrationFormEvent.EmailChanged(it))
+                viewModel.onEvent(SignInFormEvent.EmailChanged(it))
                 },
                 isError = state.emailError != null,
                 modifier = Modifier
@@ -107,7 +107,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier){
         TextField(
             value = state.password ,
             onValueChange = {
-                viewModel.onEvent(RegistrationFormEvent.PasswordChanged(it))
+                viewModel.onEvent(SignInFormEvent.PasswordChanged(it))
             },
             isError = state.passwordError != null,
             modifier = Modifier
@@ -138,45 +138,11 @@ fun AuthenticationScreen(modifier: Modifier = Modifier){
                 color =  Color(0xFFFFA500)
             )
         }
-        Spacer(modifier = Modifier.height(6.dp))
-        OutlinedTextField(
-            value = state.repeatedPassword ,
-            onValueChange = {
-                viewModel.onEvent(RegistrationFormEvent.RepeatedPasswordChanged(it))
-            },
-            isError = state.repeatedPasswordError != null,
-            modifier = Modifier
-                .size(width = 370.dp, height = 72.dp)
-                .offset(y = 184.dp)
-                .fillMaxWidth(),
-            placeholder = {
-                Text(text = "Repeat Password")
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password
-            ),
-            visualTransformation = PasswordVisualTransformation(),
-            shape = RoundedCornerShape(16.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                unfocusedBorderColor = textColor,
-                focusedBorderColor = textColor,
-                unfocusedLabelColor = Color.White,
-                focusedLabelColor = Color.White,
-                unfocusedPlaceholderColor = Color.White,
-                focusedPlaceholderColor = Color.White,
-                containerColor = textColor
-            )
-        )
-        if(state.repeatedPasswordError != null){
-            Text(
-                text = state.repeatedPasswordError,
-                color =  Color(0xFFFFA500)
-            )
-        }
+
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                      viewModel.onEvent(RegistrationFormEvent.Submit)
+                      viewModel.onEvent(SignInFormEvent.Submit)
             },
             modifier = Modifier
                 .offset(y = 450.dp)
@@ -192,15 +158,12 @@ fun AuthenticationScreen(modifier: Modifier = Modifier){
                 fontWeight = FontWeight.Bold
             )
         }
-
-
     }
-
 }
 
 @Preview
 @Composable
-fun AuthenticationScreenPreview(){
-    AuthenticationScreen()
+fun SignInScreenPreview(){
+    SignInScreen()
 }
 
