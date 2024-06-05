@@ -44,7 +44,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier){
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        val viewModel = viewModel<AuthenticationViewModel>()
+        val viewModel : AuthenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory)
         val state = viewModel.state
         val context = LocalContext.current
         LaunchedEffect(key1 = context) {

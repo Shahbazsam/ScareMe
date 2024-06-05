@@ -18,9 +18,9 @@ class DefaultContainer : AuthAppContainer {
 
     private val baseUrl = "http://itindr.mcenter.pro:8092/api/mobile/v1/"
 
-    val interceptor = HttpLoggingInterceptor()
+    private val interceptor = HttpLoggingInterceptor()
 
-    val client: OkHttpClient = Builder().addInterceptor(interceptor).build()
+    private val client: OkHttpClient = Builder().addInterceptor(interceptor).build()
 
     val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
@@ -28,9 +28,13 @@ class DefaultContainer : AuthAppContainer {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val retrofitservice : AuthApiService = retrofit.create(AuthApiService::class.java)
+    private val retrofitService : AuthApiService by lazy {
+        retrofit.create(AuthApiService::class.java)
+    }
 
-    override val authRegisterRepository: AuthRegisterRepository =
-        NetworkAuthRegisterRepository(retrofitservice)
+    override val authRegisterRepository: AuthRegisterRepository by lazy {
+        NetworkAuthRegisterRepository(retrofitService)
+
+    }
 
 }

@@ -4,7 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.scareme.ScareMeApplication
 import com.example.scareme.authenticationScreen.data.AuthRegisterRepository
 import com.example.scareme.authenticationScreen.data.model.UserData
 import com.example.scareme.authenticationScreen.domain.use_case.ValidateEmail
@@ -75,6 +80,16 @@ class AuthenticationViewModel(
         }
 
 
+    }
+
+    companion object{
+        val Factory : ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as ScareMeApplication)
+                val authRegisterRepository = application.container.authRegisterRepository
+                AuthenticationViewModel(authRegisterRepository = authRegisterRepository)
+            }
+        }
     }
 
 

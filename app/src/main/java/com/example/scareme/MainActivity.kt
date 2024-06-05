@@ -19,9 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ScareMeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                }
             }
         }
     }

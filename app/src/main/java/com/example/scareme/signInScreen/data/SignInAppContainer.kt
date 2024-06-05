@@ -15,7 +15,7 @@ interface SignInAppContainer {
     val signInRepository : SignInRepository
 }
 
-class DefaultContainer : SignInAppContainer {
+class DefaultSignInContainer : SignInAppContainer {
 
     private val baseUrl = "http://itindr.mcenter.pro:8092/api/mobile/v1/"
 
