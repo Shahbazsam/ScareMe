@@ -37,11 +37,11 @@ class ProfileViewModel(
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
 
-    private fun getToken(): String {
+    private fun fetchToken(): String {
         val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         return sharedPref.getString("token", null)?: throw IllegalStateException("Token not found in SharedPreferences")
     }
-    val token = getToken()
+    val token = fetchToken()
 
     init{
         getTopics()

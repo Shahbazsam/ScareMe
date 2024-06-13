@@ -19,7 +19,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ScareMeTheme {
-                NavigationGraph()
+                NavigationGraph(
+                    retryAction = { }
+                )
             }
         }
     }

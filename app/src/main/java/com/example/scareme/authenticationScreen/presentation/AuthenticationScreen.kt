@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.scareme.ProfileInputScreen
 import com.example.scareme.ui.theme.textColor
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -178,7 +179,8 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                      viewModel.onEvent(RegistrationFormEvent.Submit)
+                    viewModel.onEvent(RegistrationFormEvent.Submit)
+                    navController.navigate(ProfileInputScreen)
             },
             modifier = Modifier
                 .offset(y = 450.dp)

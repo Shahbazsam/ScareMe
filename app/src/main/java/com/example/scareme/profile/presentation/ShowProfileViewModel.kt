@@ -31,11 +31,11 @@ class ShowProfileViewModel(
     var showProfileUiState : ShowProfileUiState by mutableStateOf(ShowProfileUiState.Loading)
 
 
-    private fun getToken(): String {
+    private fun showToken(): String {
         val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         return sharedPref.getString("token", null)?: throw IllegalStateException("Token not found in SharedPreferences")
     }
-    val token = getToken()
+    val token = showToken()
 
     init {
         getUserInformation()

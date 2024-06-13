@@ -1,9 +1,6 @@
 package com.example.scareme.profile.presentation
 
 import android.graphics.Bitmap
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,13 +12,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,15 +38,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.scareme.R
 import com.example.scareme.profile.data.model.Topics
 import com.example.scareme.ui.theme.textColor
@@ -56,26 +53,17 @@ import com.example.scareme.ui.theme.textColor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    navController : NavController,
     retryAction: () -> Unit,
     modifier: Modifier = Modifier,
-    profileUiState: ProfileUiState,
+    //profileUiState: ProfileUiState,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    var profileImage by remember { mutableStateOf<Bitmap?>(null) }
 
     val context = LocalContext.current
     val viewModel : ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
     val state = viewModel.state
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            uri?.let {
-                val bitmap = getBitmapFromUri(context, it)
-                profileImage = bitmap
-            }
-        }
-    )
+    val profileUiState = viewModel.profileUiState
 
     Column(
         modifier = Modifier
@@ -96,30 +84,17 @@ fun ProfileScreen(
             fontWeight = FontWeight.Bold
         )
 
-        // Avatar Image
-        if (profileImage != null) {
-            Image(
-                bitmap = profileImage!!.asImageBitmap(),
-                contentDescription = "Profile Image",
-                    modifier = Modifier
-                        .offset(x = 0.dp, y = 40.dp)
-                        .padding(8.dp)
-                        .size(200.dp, 200.dp)
-                        .clip(CircleShape)
-                        .clickable { launcher.launch("image/*") },
-            )
-        } else {
+
             Image(
                 modifier = Modifier
                     .offset(x = 0.dp, y = 40.dp)
                     .padding(8.dp)
                     .size(200.dp, 200.dp)
                     .clip(CircleShape)
-                    .clickable { launcher.launch("image/*") },
+                    .clickable {  },
                 painter = painterResource(id = R.drawable.profile),
                 contentDescription = null
             )
-        }
 
         // Name TextField
         TextField(
@@ -218,27 +193,31 @@ fun TopicScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ){
 
-    LazyVerticalStaggeredGrid(
-
-        columns = StaggeredGridCells.Adaptive(60.dp),
+    LazyColumn(
         modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+    ) {
+        items(topics.chunked(3)){topic ->
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                items(topic){topic ->
+                    var isSelected by remember { mutableStateOf(false) }
+                    TopicButton(
+                        topicTitle = topic.title  ,
+                        isSelected = isSelected,
+                        onClick = { isSelected = !isSelected }
+                    )
 
-            .fillMaxWidth(),
-        contentPadding = PaddingValues(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalItemSpacing = 12.dp,
-        content = {
-            items(topics) { topic ->
-                var isSelected by remember { mutableStateOf(false) }
-                TopicButton(
-                    topicTitle = topic.title  ,
-                    isSelected = isSelected,
-                    onClick = { isSelected = !isSelected }
-                )
+                }
+
             }
         }
-    )
-
+    }
 }
 
 @Composable
@@ -290,11 +269,3 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
 fun DefaultPreview() {
     ProfileScreen()
 } */
-
-private fun getBitmapFromUri(context: android.content.Context, uri: Uri): Bitmap? {
-    return try {
-        android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-    } catch (e: Exception) {
-        null
-    }
-}

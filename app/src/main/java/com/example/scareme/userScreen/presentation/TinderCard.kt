@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.alexstyl.swipeablecard.ExperimentalSwipeableCardApi
@@ -48,6 +49,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TinderCardWindow(
+    navController: NavController,
     retryAction: () -> Unit,
     modifier: Modifier = Modifier
 ){

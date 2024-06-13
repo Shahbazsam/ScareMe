@@ -31,13 +31,14 @@ class UserViewModel(
 
     var userUiState: UserUiState by mutableStateOf(UserUiState.Loading)
         private set
-    private fun getToken(): String {
+      fun findToken(): String {
         val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         return sharedPref.getString("token", null)?: throw IllegalStateException("Token not found in SharedPreferences")
     }
-    val token = getToken()
+    val token = findToken()
 
-    init {
+
+        init {
         getUserDetails()
     }
 

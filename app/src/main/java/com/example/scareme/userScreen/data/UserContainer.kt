@@ -8,6 +8,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 interface UserContainer{
     val userRepository : UserRepository
@@ -22,7 +23,7 @@ class DefaultUserContainer : UserContainer{
     private val retrofit : Retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(client)
-        .addConverterFactory( Json.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory( GsonConverterFactory.create())
         .build()
 
     private val retrofitService : UserApiService by lazy {

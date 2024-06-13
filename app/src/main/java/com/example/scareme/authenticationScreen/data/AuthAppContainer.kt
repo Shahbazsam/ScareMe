@@ -18,7 +18,9 @@ class DefaultContainer : AuthAppContainer {
 
     private val baseUrl = "http://itindr.mcenter.pro:8092/api/mobile/v1/"
 
-    private val interceptor = HttpLoggingInterceptor()
+    private val interceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
 
     private val client: OkHttpClient = Builder().addInterceptor(interceptor).build()
 

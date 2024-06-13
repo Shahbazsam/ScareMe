@@ -2,6 +2,7 @@ package com.example.scareme.signInScreen.presentation
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -70,6 +71,7 @@ class SignInViewModel(
                 )
 
                 val token = signInRepository.getRegistered(userData)
+                Log.d("token" , {"${token.accessToken}"}.toString())
 
                 // Save token into shared preferences
                 val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)

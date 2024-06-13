@@ -19,7 +19,9 @@ class DefaultSignInContainer : SignInAppContainer {
 
     private val baseUrl = "http://itindr.mcenter.pro:8092/api/mobile/v1/"
 
-    val interceptor = HttpLoggingInterceptor()
+    val interceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
 
     val client: OkHttpClient = Builder().addInterceptor(interceptor).build()
 

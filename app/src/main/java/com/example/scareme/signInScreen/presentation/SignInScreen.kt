@@ -31,12 +31,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.scareme.TinderNav
 
 import com.example.scareme.ui.theme.textColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignInScreen(navController: NavController,modifier: Modifier = Modifier){
+fun SignInScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier
+){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -144,6 +148,7 @@ fun SignInScreen(navController: NavController,modifier: Modifier = Modifier){
         Button(
             onClick = {
                       viewModel.onEvent(SignInFormEvent.Submit)
+                navController.navigate(TinderNav)
             },
             modifier = Modifier
                 .offset(y = 450.dp)
