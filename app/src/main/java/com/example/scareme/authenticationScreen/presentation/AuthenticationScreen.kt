@@ -31,11 +31,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.scareme.ui.theme.textColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AuthenticationScreen(modifier: Modifier = Modifier){
+fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavController){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -198,6 +200,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier){
 @Preview
 @Composable
 fun AuthenticationScreenPreview(){
-    AuthenticationScreen()
+    val navController = rememberNavController()
+    AuthenticationScreen(navController = navController)
 }
 

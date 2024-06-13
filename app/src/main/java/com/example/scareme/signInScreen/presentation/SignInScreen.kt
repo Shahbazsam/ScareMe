@@ -30,12 +30,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 
 import com.example.scareme.ui.theme.textColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignInScreen(modifier: Modifier = Modifier){
+fun SignInScreen(navController: NavController,modifier: Modifier = Modifier){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -164,6 +165,6 @@ fun SignInScreen(modifier: Modifier = Modifier){
 @Preview
 @Composable
 fun SignInScreenPreview(){
-    SignInScreen()
+    //SignInScreen()
 }
 

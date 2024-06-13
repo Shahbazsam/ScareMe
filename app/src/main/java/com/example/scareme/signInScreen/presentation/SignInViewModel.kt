@@ -1,5 +1,7 @@
 package com.example.scareme.signInScreen.presentation
 
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -21,7 +23,8 @@ import kotlinx.coroutines.launch
 class SignInViewModel(
     private val validateEmail: ValidateEmail = ValidateEmail(),
     private val validatePassword: ValidatePassword = ValidatePassword(),
-    private val signInRepository: SignInRepository
+    private val signInRepository: SignInRepository,
+    private val application: Application
 ) : ViewModel() {
 
     var state by mutableStateOf(SignInFormState())
@@ -66,7 +69,15 @@ class SignInViewModel(
                     password = state.password
                 )
 
-                signInRepository.getRegistered(userData)
+                val token = signInRepository.getRegistered(userData)
+
+                // Save token into shared preferences
+                val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+                with(sharedPref.edit()) {
+                    putString("token", token.accessToken)
+                    apply()
+                }
+
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }
@@ -78,7 +89,10 @@ class SignInViewModel(
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ScareMeApplication)
                 val signInRepository = application.container2.signInRepository
-                SignInViewModel(signInRepository = signInRepository)
+                SignInViewModel(
+                    signInRepository = signInRepository,
+                    application = application
+                    )
             }
         }
     }

@@ -24,11 +24,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.scareme.R
+import com.example.scareme.ScreenSplash
+import com.example.scareme.SignIn
+import com.example.scareme.SignUp
+import com.example.scareme.profile.presentation.ProfileViewModel
 
 
 @Composable
-fun AuthenticationSection(){
+fun AuthenticationSection(navController: NavController){
     Box {
         Column(
             modifier = Modifier
@@ -96,7 +102,7 @@ fun AuthenticationSection(){
         ) {
 
             Button(
-                onClick = {  },
+                onClick = { navController.navigate(SignUp) },
                 modifier = Modifier
                     .offset(y = 660.dp)
                     .size(width = 328.dp, height = 56.dp)
@@ -120,7 +126,7 @@ fun AuthenticationSection(){
             Text(
                 modifier = Modifier
                     .clickable {
-
+                        navController.navigate(SignIn)
                     },
                 text = "Sign in.",
                 color = Color(0xFFF6921D)
@@ -136,5 +142,6 @@ fun AuthenticationSection(){
 @Preview(showBackground = true)
 @Composable
 fun AuthenticationScreenTheme() {
-    AuthenticationSection()
+    val navController = rememberNavController()
+   AuthenticationSection(navController = navController)
 }

@@ -1,5 +1,7 @@
 package com.example.scareme.authenticationScreen.presentation
 
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -23,7 +25,8 @@ class AuthenticationViewModel(
     private val validateEmail: ValidateEmail = ValidateEmail(),
     private val validatePassword: ValidatePassword = ValidatePassword(),
     private val validateRepeatedPassword: ValidateRepeatedPassword = ValidateRepeatedPassword(),
-    private val authRegisterRepository: AuthRegisterRepository
+    private val authRegisterRepository: AuthRegisterRepository,
+    private val application: Application
 ) : ViewModel() {
 
     var state by mutableStateOf(RegistrationFormState())
@@ -74,7 +77,15 @@ class AuthenticationViewModel(
                     password = state.password
                 )
 
-                authRegisterRepository.getRegistered(userData)
+                val token = authRegisterRepository.getRegistered(userData)
+
+                // Save token into shared preferences
+                val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+                with(sharedPref.edit()) {
+                    putString("token", token.accessToken)
+                    apply()
+                }
+
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }
@@ -87,7 +98,10 @@ class AuthenticationViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as ScareMeApplication)
                 val authRegisterRepository = application.container.authRegisterRepository
-                AuthenticationViewModel(authRegisterRepository = authRegisterRepository)
+                AuthenticationViewModel(
+                    authRegisterRepository = authRegisterRepository,
+                    application = application
+                    )
             }
         }
     }
