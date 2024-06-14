@@ -13,6 +13,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.scareme.ScareMeApplication
 import com.example.scareme.profile.data.ProfileRepository
 import com.example.scareme.profile.data.model.UserInformation
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -25,32 +27,30 @@ sealed interface ShowProfileUiState{
 
 class ShowProfileViewModel(
     private val profileRepository: ProfileRepository,
-    private val application: Application,
+
 ) :ViewModel(){
 
-    var showProfileUiState : ShowProfileUiState by mutableStateOf(ShowProfileUiState.Loading)
+    private val _showProfileUiState = MutableStateFlow<ShowProfileUiState>(ShowProfileUiState.Loading)
+    val showProfileUiState = _showProfileUiState.asStateFlow()
 
+   private var token : String = ""
 
-    private fun showToken(): String {
-        val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-        return sharedPref.getString("token", null)?: throw IllegalStateException("Token not found in SharedPreferences")
-    }
-    val token = showToken()
+    fun onTokenAvailable(token : String){
+        this.token = token
+        viewModelScope.launch { getUserInformation() }
 
-    init {
-        getUserInformation()
     }
 
     fun getUserInformation(){
         viewModelScope.launch {
-            showProfileUiState = ShowProfileUiState.Loading
-            showProfileUiState = try {
+            _showProfileUiState.value = ShowProfileUiState.Loading
+             try {
                 val userInfo = profileRepository.getUserProfile(token)
-                ShowProfileUiState.Success(userInfo)
+                _showProfileUiState.value = ShowProfileUiState.Success(userInfo)
             }catch (e : IOException){
-                ShowProfileUiState.Error
+                _showProfileUiState.value = ShowProfileUiState.Error
             }catch (e: HttpException){
-                ShowProfileUiState.Error
+                 _showProfileUiState.value = ShowProfileUiState.Error
             }
         }
     }
@@ -64,7 +64,7 @@ class ShowProfileViewModel(
                 val profileRepository = application.profileContainer.profileRepository
                 ShowProfileViewModel(
                     profileRepository = profileRepository,
-                    application = application
+
                     )
             }
         }

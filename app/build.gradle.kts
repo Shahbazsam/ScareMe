@@ -72,6 +72,9 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation ("androidx.datastore:datastore-preferences:1.1.1") // Use the latest version if available
+
+
 
     implementation ("com.alexstyl.swipeablecard:swipeablecard:0.1.0")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.26.1-alpha")

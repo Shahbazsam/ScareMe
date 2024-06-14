@@ -11,6 +11,7 @@ data class UserInformation(
     val topics : List<Topics>?
 )
 
+@Serializable
 data class UserInformationToSend(
     val name : String,
     val aboutMyself : String?,

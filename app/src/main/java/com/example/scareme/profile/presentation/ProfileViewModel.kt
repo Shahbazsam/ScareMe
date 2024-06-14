@@ -1,7 +1,5 @@
 package com.example.scareme.profile.presentation
 
-import android.app.Application
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +14,8 @@ import com.example.scareme.profile.data.ProfileRepository
 import com.example.scareme.profile.data.model.Topics
 import com.example.scareme.profile.data.model.UserInformationToSend
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -27,35 +27,38 @@ sealed interface ProfileUiState{
     object Loading : ProfileUiState
 }
 class ProfileViewModel(
-    private val application: Application,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+
 ) : ViewModel() {
 
-    var profileUiState : ProfileUiState by mutableStateOf(ProfileUiState.Loading)
+    private val _profileUiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
+    val profileUiState = _profileUiState.asStateFlow()
     var state by mutableStateOf(ProfileFormState())
 
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
 
-    private fun fetchToken(): String {
-        val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-        return sharedPref.getString("token", null)?: throw IllegalStateException("Token not found in SharedPreferences")
-    }
-    val token = fetchToken()
+    private var token: String = "" // Store the token
 
-    init{
-        getTopics()
-    }
-
-    fun getTopics(){
+    fun onTokenAvailable(token: String) {
+        this.token = token
         viewModelScope.launch {
-            profileUiState = ProfileUiState.Loading
-            profileUiState = try {
-                ProfileUiState.Success(profileRepository.getTopics(token))
+            getTopics()
+        }
+    }
+
+    //val token = tokenRepository.getToken()
+     suspend fun getTopics(){
+        viewModelScope.launch {
+            _profileUiState.value = ProfileUiState.Loading
+            try {
+                val response = profileRepository.getTopics(token)
+                _profileUiState.value = ProfileUiState.Success(response)
+
             }catch (e : IOException){
-                ProfileUiState.Error
+                _profileUiState.value = ProfileUiState.Error
             }catch (e:HttpException){
-                ProfileUiState.Error
+                _profileUiState.value=  ProfileUiState.Error
             }
 
         }
@@ -78,29 +81,31 @@ class ProfileViewModel(
         }
     }
 
-    private fun submitData(){
+    private fun submitData() {
         viewModelScope.launch {
-            val userInformation = UserInformationToSend (
+            val userInformation = UserInformationToSend(
                 name = state.name,
                 aboutMyself = state.aboutMyself,
                 topics = state.topics
             )
-            profileRepository.updateUserProfile(token = token , userInformation = userInformation)
-            validationEventChannel.send(ValidationEvent.Success)
+            try {
+                    profileRepository.updateUserProfile(token = "Bearer $token", userInformation = userInformation)
+                validationEventChannel.send(ValidationEvent.Success)
+            } catch (e: Exception) {
+                // Handle error, e.g., show an error message
+                println("Error updating profile: ${e.message}")
+            }
         }
-
-
     }
 
-    companion object{
-        val Factory : ViewModelProvider.Factory = viewModelFactory {
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as ScareMeApplication)
                 val profileRepository = application.profileContainer.profileRepository
                 ProfileViewModel(
-                    profileRepository = profileRepository ,
-                    application = application
-                    )
+                    profileRepository = profileRepository,
+                )
             }
         }
     }

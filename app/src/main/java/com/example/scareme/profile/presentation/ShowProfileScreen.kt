@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,14 +43,15 @@ import com.example.scareme.profile.data.model.UserInformation
 
 @Composable
 fun ShowProfileScreen(
-
     retryAction: () -> Unit,
     modifier: Modifier = Modifier
 ){
 
 
     val viewModel : ShowProfileViewModel = viewModel(factory = ShowProfileViewModel.Factory)
-    val showProfileUiState = viewModel.showProfileUiState
+    val uiState by  viewModel.showProfileUiState.collectAsState()
+
+    val showProfileUiState = uiState
 
     when(showProfileUiState){
         is ShowProfileUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())

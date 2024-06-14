@@ -1,24 +1,21 @@
 package com.example.scareme.signInScreen.presentation
 
-import android.app.Application
-import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.scareme.SaveTokenUtil
 import com.example.scareme.ScareMeApplication
-import com.example.scareme.TokenRepository
-import com.example.scareme.authenticationScreen.presentation.AuthenticationViewModel
+import com.example.scareme.profile.presentation.ShowProfileViewModel
 import com.example.scareme.signInScreen.data.SignInRepository
 import com.example.scareme.signInScreen.data.model.UserData
 import com.example.scareme.signInScreen.domain.use_case.ValidateEmail
 import com.example.scareme.signInScreen.domain.use_case.ValidatePassword
+import com.example.scareme.userScreen.presentation.UserViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -27,7 +24,9 @@ class SignInViewModel(
     private val validateEmail: ValidateEmail = ValidateEmail(),
     private val validatePassword: ValidatePassword = ValidatePassword(),
     private val signInRepository: SignInRepository,
-    private val tokenRepository: TokenRepository
+    val userViewModel: UserViewModel,
+    val showProfileViewModel: ShowProfileViewModel
+
 ) : ViewModel() {
 
     var state by mutableStateOf(SignInFormState())
@@ -72,10 +71,9 @@ class SignInViewModel(
                     password = state.password
                 )
 
-                val token = signInRepository.getRegistered(userData)
-                Log.d("token" , {"${token.accessToken}"}.toString())
-
-               tokenRepository.setToken(token.accessToken)
+                val token = signInRepository.getSignedIn(userData)
+                userViewModel.onTokenAvailable(token.accessToken)
+                showProfileViewModel.onTokenAvailable(token.accessToken)
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }
@@ -84,11 +82,12 @@ class SignInViewModel(
     companion object{
         val Factory : ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ScareMeApplication)
+                val application = (this[APPLICATION_KEY] as ScareMeApplication)
                 val signInRepository = application.container2.signInRepository
                 SignInViewModel(
                     signInRepository = signInRepository,
-                    tokenRepository = application.tokenRepository
+                    userViewModel = application.userViewModel,
+                    showProfileViewModel = application.showProfileViewModel
                     )
             }
         }

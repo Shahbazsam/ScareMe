@@ -71,7 +71,7 @@ fun SignInScreen(
                 modifier = Modifier
                     .size(width = 343.dp, height = 63.dp)
                     .offset(y = 144.dp),
-                text = "Sign Up      ",
+                text = "Sign In      ",
                 color = Color.White,
                 fontSize = 46.sp,
                 fontWeight = FontWeight.Bold

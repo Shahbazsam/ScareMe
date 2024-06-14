@@ -1,7 +1,5 @@
 package com.example.scareme.authenticationScreen.presentation
 
-import android.app.Application
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,13 +9,15 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.scareme.SaveTokenUtil
 import com.example.scareme.ScareMeApplication
 import com.example.scareme.authenticationScreen.data.AuthRegisterRepository
 import com.example.scareme.authenticationScreen.data.model.UserData
 import com.example.scareme.authenticationScreen.domain.use_case.ValidateEmail
 import com.example.scareme.authenticationScreen.domain.use_case.ValidatePassword
 import com.example.scareme.authenticationScreen.domain.use_case.ValidateRepeatedPassword
+import com.example.scareme.profile.presentation.ProfileViewModel
+import com.example.scareme.profile.presentation.ShowProfileViewModel
+import com.example.scareme.userScreen.presentation.UserViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -27,7 +27,9 @@ class AuthenticationViewModel(
     private val validatePassword: ValidatePassword = ValidatePassword(),
     private val validateRepeatedPassword: ValidateRepeatedPassword = ValidateRepeatedPassword(),
     private val authRegisterRepository: AuthRegisterRepository,
-    private val application: Application
+    val profileViewModel: ProfileViewModel,
+    val userViewModel: UserViewModel,
+    val showProfileViewModel: ShowProfileViewModel
 ) : ViewModel() {
 
     var state by mutableStateOf(RegistrationFormState())
@@ -80,12 +82,12 @@ class AuthenticationViewModel(
 
                 val token = authRegisterRepository.getRegistered(userData)
 
-                SaveTokenUtil.saveToken(application , token.accessToken)
+                profileViewModel.onTokenAvailable(token.accessToken)
+                userViewModel.onTokenAvailable(token.accessToken)
+                showProfileViewModel.onTokenAvailable(token.accessToken)
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }
-
-
     }
 
     companion object{
@@ -95,7 +97,9 @@ class AuthenticationViewModel(
                 val authRegisterRepository = application.container.authRegisterRepository
                 AuthenticationViewModel(
                     authRegisterRepository = authRegisterRepository,
-                    application = application
+                    profileViewModel =application.profileViewModel,
+                    userViewModel = application.userViewModel,
+                    showProfileViewModel = application.showProfileViewModel
                     )
             }
         }

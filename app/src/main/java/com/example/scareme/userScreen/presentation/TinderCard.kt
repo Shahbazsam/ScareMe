@@ -26,6 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +49,7 @@ import com.alexstyl.swipeablecard.Direction
 import com.alexstyl.swipeablecard.ExperimentalSwipeableCardApi
 import com.alexstyl.swipeablecard.rememberSwipeableCardState
 import com.alexstyl.swipeablecard.swipableCard
+import com.example.scareme.BottomNavigationBar
 import com.example.scareme.R
 import com.example.scareme.userScreen.data.model.UserData
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -57,10 +60,13 @@ import kotlinx.coroutines.launch
 fun TinderCardWindow(
     navController: NavController,
     viewModel: UserViewModel,
-    userUiState: UserUiState,
+
     retryAction: () -> Unit,
     modifier: Modifier = Modifier
 ){
+    val uiState by viewModel.userUiState.collectAsState()
+
+    val userUiState = uiState
 
     when(userUiState){
         is UserUiState.Loading -> UserLoadingScreen(modifier = modifier.fillMaxSize())
@@ -69,7 +75,6 @@ fun TinderCardWindow(
         )
         is UserUiState.Error -> UserErrorScreen(retryAction, modifier = modifier.fillMaxSize())
     }
-
 }
 @Composable
 fun UserLoadingScreen(modifier: Modifier = Modifier) {
@@ -213,6 +218,7 @@ fun SwipeUserScreen(
             )
         }
     }
+    //BottomNavigationBar()
 }
 
 @Composable
@@ -235,7 +241,7 @@ fun CircleButton(
 @Composable
 fun ProfileCard(
     modifier: Modifier,
-    name: String,
+    name: String?,
     avatar: String?,
 ) {
     Card(modifier) {
@@ -250,13 +256,15 @@ fun ProfileCard(
                 modifier = Modifier.fillMaxWidth()
             )
             Column(Modifier.align(Alignment.BottomStart)) {
-                Text(
-                    text = name,
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(10.dp)
-                )
+                if (name != null) {
+                    Text(
+                        text = name,
+                        color = Color.White,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.example.scareme.profile.presentation
 
-import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,6 +30,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,11 +44,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.scareme.MockDataRepo.MockProfileRepository
+import com.example.scareme.ProfileInputScreen
 import com.example.scareme.R
+import com.example.scareme.TinderNav
+import com.example.scareme.authenticationScreen.presentation.AuthenticationViewModel
 import com.example.scareme.profile.data.model.Topics
 import com.example.scareme.ui.theme.textColor
 
@@ -56,11 +63,30 @@ fun ProfileScreen(
     navController : NavController,
     retryAction: () -> Unit,
     viewModel: ProfileViewModel,
-    profileUiState: ProfileUiState,
+
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
 
+    val uiState by viewModel.profileUiState.collectAsState()
+
+    val profileUiState = uiState
+
+
     val context = LocalContext.current
+    LaunchedEffect(key1 = context) {
+        viewModel.validationEvents.collect{event ->
+            when(event){
+                is ProfileViewModel.ValidationEvent.Success ->{
+                    Toast.makeText(
+                        context,
+                        "Profile Updated Successful",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    navController.navigate(TinderNav)
+                }
+            }
+        }
+    }
     val state = viewModel.state
     Column(
         modifier = Modifier
@@ -74,21 +100,19 @@ fun ProfileScreen(
         Text(
             modifier = Modifier
                 .size(width = 328.dp, height = 42.dp)
-                .offset(x = 50.dp, y = 57.dp),
+                .offset(x = 50.dp, y = 27.dp),
             text = "Why are you Scary?",
             color = Color.White,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
-
-
             Image(
                 modifier = Modifier
-                    .offset(x = 0.dp, y = 40.dp)
+                    .offset(x = 0.dp, y = 5.dp)
                     .padding(8.dp)
                     .size(200.dp, 200.dp)
                     .clip(CircleShape)
-                    .clickable {  },
+                    .clickable { },
                 painter = painterResource(id = R.drawable.profile),
                 contentDescription = null
             )
@@ -99,7 +123,7 @@ fun ProfileScreen(
             onValueChange = { viewModel.onEvent(ProfileEvent.NameChanged(it)) },
             modifier = Modifier
                 .size(width = 370.dp, height = 72.dp)
-                .offset(y = 40.dp)
+                .offset(y = 0.dp)
                 .fillMaxWidth(),
             placeholder = {
                 Text(text = "Name")
@@ -122,9 +146,9 @@ fun ProfileScreen(
             value = state.aboutMyself,
             onValueChange = { viewModel.onEvent(ProfileEvent.aboutMyselfChanged(it)) },
             modifier = Modifier
-                .padding(8.dp)
+                .padding(6.dp)
                 .size(width = 370.dp, height = 152.dp)
-                .offset(y = 40.dp)
+                .offset(y = 0.dp)
                 .fillMaxWidth(),
             placeholder = {
                 Text(text = "About")
@@ -145,41 +169,46 @@ fun ProfileScreen(
 
         Text(
             modifier = Modifier
-                .padding(18.dp)
+                .padding(8.dp)
                 .size(width = 328.dp, height = 42.dp)
-                .offset(x = 90.dp, y = 42.dp),
+                .offset(x = 90.dp, y = 0.dp),
             text = "Party Topics",
             color = Color.White,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.padding(12.dp))
-        when (profileUiState){
-            is ProfileUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxSize())
-            is ProfileUiState.Success -> TopicScreen(
-                profileUiState.topics , contentPadding = contentPadding , modifier = Modifier.fillMaxWidth()
-            )
-            is ProfileUiState.Error -> ErrorScreen(retryAction  , modifier = Modifier.fillMaxSize())
+        Box (modifier = Modifier
+            .fillMaxWidth()
+            .height(290.dp)){
+            when (profileUiState){
+                is ProfileUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxSize())
+                is ProfileUiState.Success -> TopicScreen(
+                    profileUiState.topics , contentPadding = contentPadding , modifier = Modifier.fillMaxWidth()
+                )
+                is ProfileUiState.Error -> ErrorScreen(retryAction  , modifier = Modifier.fillMaxSize())
+
+            }
+            //Spacer(modifier = Modifier.height(1.dp))
+            // Save Button
+            Button(
+                onClick = { viewModel.onEvent(ProfileEvent.Submit) },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .size(width = 370.dp, height = 64.dp)
+                    .fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(Color(0xFFFFA500)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(
+                    text = "Save",
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
         }
 
-        // Save Button
-        Button(
-            onClick = { viewModel.onEvent(ProfileEvent.Submit) },
-            modifier = Modifier
-                .offset(y = 75.dp)
-                .size(width = 370.dp, height = 64.dp)
-                .fillMaxWidth(),
-            colors = ButtonDefaults.outlinedButtonColors(Color(0xFFFFA500)),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Text(
-                text = "Save",
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-        }
     }
 }
 
@@ -193,7 +222,7 @@ fun TopicScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(80.dp)
     ) {
         items(topics.chunked(3)){topic ->
             LazyRow(
@@ -237,7 +266,7 @@ fun TopicButton(topicTitle: String,isSelected: Boolean, onClick: () -> Unit) {
 @Composable
 fun LoadingScreen(modifier: Modifier = Modifier) {
     Image(
-        modifier = modifier.size(200.dp),
+        modifier = modifier.size(80.dp),
         painter = painterResource(R.drawable.loading_img),
         contentDescription = null
     )
@@ -260,9 +289,15 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-/*
+
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
-    ProfileScreen()
-} */
+fun DefaultProfilePreview() {
+    val mockRepository = MockProfileRepository()
+    val viewModel = ProfileViewModel(profileRepository = mockRepository)
+    ProfileScreen(
+        navController = rememberNavController(),
+        retryAction = {  },
+        viewModel = viewModel
+    )
+}

@@ -1,20 +1,15 @@
 package com.example.scareme.userScreen.presentation
 
-import android.app.Application
-import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.scareme.SaveTokenUtil
 import com.example.scareme.ScareMeApplication
-import com.example.scareme.TokenRepository
 import com.example.scareme.userScreen.data.UserRepository
 import com.example.scareme.userScreen.data.model.UserData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -28,17 +23,17 @@ sealed interface UserUiState {
 
 class UserViewModel(
     private val userRepository: UserRepository,
-    private val tokenRepository: TokenRepository
 ) : ViewModel() {
 
-    var userUiState: UserUiState by mutableStateOf(UserUiState.Loading)
-        private set
+    private val _userUiState = MutableStateFlow<UserUiState>(UserUiState.Loading)
+    val userUiState = _userUiState.asStateFlow()
 
-    private val token : String
-        get() =  tokenRepository.getToken()
-
-    init {
-        getUserDetails()
+    private var token: String = "" // Store the token
+    fun onTokenAvailable(token: String) {
+        this.token = token
+        viewModelScope.launch {
+            getUserDetails()
+        }
     }
 
     fun likeUser(userId: String) {
@@ -59,13 +54,14 @@ class UserViewModel(
 
     fun getUserDetails(){
         viewModelScope.launch {
-            userUiState = UserUiState.Loading
-            userUiState = try {
-                UserUiState.Success(userRepository.getUser(token ))
+            _userUiState.value = UserUiState.Loading
+             try {
+                val response = userRepository.getUser("Bearer $token" )
+                _userUiState.value = UserUiState.Success(response)
             } catch (e: IOException) {
-                UserUiState.Error
+                _userUiState.value = UserUiState.Error
             } catch (e: HttpException) {
-                UserUiState.Error
+                _userUiState.value = UserUiState.Error
             }
 
         }
@@ -78,8 +74,7 @@ class UserViewModel(
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ScareMeApplication)
                 val userRepository = application.userContainer.userRepository
                 UserViewModel(
-                    userRepository = userRepository,
-                    tokenRepository = application.tokenRepository
+                    userRepository = userRepository
                     )
             }
         }
