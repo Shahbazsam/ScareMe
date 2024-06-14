@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.scareme.ScareMeApplication
+import com.example.scareme.TokenRepository
 import com.example.scareme.profile.data.ProfileRepository
 import com.example.scareme.profile.data.model.Topics
 import com.example.scareme.profile.data.model.UserInformationToSend
@@ -27,8 +28,8 @@ sealed interface ProfileUiState{
     object Loading : ProfileUiState
 }
 class ProfileViewModel(
-    private val application: Application,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val tokenRepository: TokenRepository
 ) : ViewModel() {
 
     var profileUiState : ProfileUiState by mutableStateOf(ProfileUiState.Loading)
@@ -37,11 +38,7 @@ class ProfileViewModel(
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
 
-    private fun fetchToken(): String {
-        val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-        return sharedPref.getString("token", null)?: throw IllegalStateException("Token not found in SharedPreferences")
-    }
-    val token = fetchToken()
+    val token = tokenRepository.getToken()
 
     init{
         getTopics()
@@ -99,7 +96,7 @@ class ProfileViewModel(
                 val profileRepository = application.profileContainer.profileRepository
                 ProfileViewModel(
                     profileRepository = profileRepository ,
-                    application = application
+                    tokenRepository = application.tokenRepository
                     )
             }
         }

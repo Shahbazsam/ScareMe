@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.scareme.SaveTokenUtil
 import com.example.scareme.ScareMeApplication
+import com.example.scareme.TokenRepository
 import com.example.scareme.authenticationScreen.data.AuthRegisterRepository
 import com.example.scareme.authenticationScreen.data.model.UserData
 import com.example.scareme.authenticationScreen.domain.use_case.ValidateEmail
@@ -27,7 +28,8 @@ class AuthenticationViewModel(
     private val validatePassword: ValidatePassword = ValidatePassword(),
     private val validateRepeatedPassword: ValidateRepeatedPassword = ValidateRepeatedPassword(),
     private val authRegisterRepository: AuthRegisterRepository,
-    private val application: Application
+    private val tokenRepository: TokenRepository
+
 ) : ViewModel() {
 
     var state by mutableStateOf(RegistrationFormState())
@@ -80,12 +82,10 @@ class AuthenticationViewModel(
 
                 val token = authRegisterRepository.getRegistered(userData)
 
-                SaveTokenUtil.saveToken(application , token.accessToken)
+                tokenRepository.setToken(token.accessToken)
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }
-
-
     }
 
     companion object{
@@ -95,7 +95,7 @@ class AuthenticationViewModel(
                 val authRegisterRepository = application.container.authRegisterRepository
                 AuthenticationViewModel(
                     authRegisterRepository = authRegisterRepository,
-                    application = application
+                    tokenRepository = application.tokenRepository
                     )
             }
         }
