@@ -55,16 +55,13 @@ import com.example.scareme.ui.theme.textColor
 fun ProfileScreen(
     navController : NavController,
     retryAction: () -> Unit,
-    modifier: Modifier = Modifier,
-    //profileUiState: ProfileUiState,
+    viewModel: ProfileViewModel,
+    profileUiState: ProfileUiState,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
 
     val context = LocalContext.current
-    val viewModel : ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
     val state = viewModel.state
-    val profileUiState = viewModel.profileUiState
-
     Column(
         modifier = Modifier
             .fillMaxSize()

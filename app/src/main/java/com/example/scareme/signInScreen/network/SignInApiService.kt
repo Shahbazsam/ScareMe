@@ -8,6 +8,6 @@ import retrofit2.http.POST
 
 interface SignInApiService {
 
-    @POST("auth/register")
+    @POST("auth/login")
     suspend fun register(@Body userDate : UserData) : Token
 }

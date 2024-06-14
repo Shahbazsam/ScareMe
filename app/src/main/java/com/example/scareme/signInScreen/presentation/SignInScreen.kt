@@ -34,6 +34,7 @@ import androidx.navigation.NavController
 import com.example.scareme.TinderNav
 
 import com.example.scareme.ui.theme.textColor
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +62,7 @@ fun SignInScreen(
                             "Registration Successful",
                             Toast.LENGTH_LONG
                         ).show()
+                        navController.navigate(TinderNav)
                     }
                 }
             }
@@ -148,7 +150,6 @@ fun SignInScreen(
         Button(
             onClick = {
                       viewModel.onEvent(SignInFormEvent.Submit)
-                navController.navigate(TinderNav)
             },
             modifier = Modifier
                 .offset(y = 450.dp)

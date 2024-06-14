@@ -47,7 +47,7 @@ class SignInViewModel(
             }
         }
     }
-    private fun submitData(){
+    private fun submitData() {
         val emailResult = validateEmail.execute(state.email)
         val passwordResult = validatePassword.execute(state.password)
 
@@ -73,17 +73,14 @@ class SignInViewModel(
                 val token = signInRepository.getRegistered(userData)
                 Log.d("token" , {"${token.accessToken}"}.toString())
 
-                // Save token into shared preferences
                 val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-                with(sharedPref.edit()) {
+                with(sharedPref.edit()){
                     putString("token", token.accessToken)
                     apply()
                 }
-
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }
-
 
     }
     companion object{

@@ -31,27 +31,45 @@ class UserViewModel(
 
     var userUiState: UserUiState by mutableStateOf(UserUiState.Loading)
         private set
-      fun findToken(): String {
-        val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-        return sharedPref.getString("token", null)?: throw IllegalStateException("Token not found in SharedPreferences")
-    }
-    val token = findToken()
 
-
-        init {
-        getUserDetails()
-    }
-
-
-    fun likeUser(userId : String ){
-        viewModelScope.launch {
-            userRepository.likeUser(token , userId )
+    private var _token: String? = null
+    val token: String
+        get() {
+            if (_token == null) {
+                _token = findToken()
+            }
+            return _token ?: throw IllegalStateException("Token not found in SharedPreferences")
         }
 
-    }
-    fun dislikeUser(userId : String){
+    init {
         viewModelScope.launch {
-            userRepository.dislikeUser(token, userId)
+            _token = findToken()
+            if (_token != null) {
+                getUserDetails()
+            } else {
+                userUiState = UserUiState.Error // or navigate to login
+            }
+        }
+    }
+    private fun findToken(): String? {
+        val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+        return sharedPref.getString("token", null)
+    }
+
+
+    fun likeUser(userId: String) {
+        viewModelScope.launch {
+            token.let {
+                userRepository.likeUser(it, userId)
+            }
+        }
+    }
+
+    fun dislikeUser(userId: String) {
+        viewModelScope.launch {
+            token.let {
+                userRepository.dislikeUser(it, userId)
+            }
         }
     }
 

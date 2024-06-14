@@ -50,11 +50,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun TinderCardWindow(
     navController: NavController,
+    viewModel: UserViewModel,
+    userUiState: UserUiState,
     retryAction: () -> Unit,
     modifier: Modifier = Modifier
 ){
-    val viewModel : UserViewModel = viewModel(factory = UserViewModel.Factory)
-    val userUiState = viewModel.userUiState
 
     when(userUiState){
         is UserUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
