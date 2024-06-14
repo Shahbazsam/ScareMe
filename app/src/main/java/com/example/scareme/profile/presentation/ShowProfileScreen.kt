@@ -193,6 +193,7 @@ fun DefaultPreview() {
     SuccessScreen(
         userInformation = listOf(
             UserInformation(
+                userId = "hhgghhhg",
                 name = "John Doe",
                 avatar = "http://itindr.mcenter.pro:8092/static/avatar_313f445d-7e23-4c97-97b3-b1963244a633.png",
                 aboutMyself = "Hello, I am John Doe.",

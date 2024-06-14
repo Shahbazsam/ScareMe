@@ -4,16 +4,29 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,21 +40,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.alexstyl.swipeablecard.Direction
 import com.alexstyl.swipeablecard.ExperimentalSwipeableCardApi
 import com.alexstyl.swipeablecard.rememberSwipeableCardState
 import com.alexstyl.swipeablecard.swipableCard
-import com.alexstyl.swipeablecard.Direction
 import com.example.scareme.R
-import com.example.scareme.profile.data.model.UserInformation
-import com.example.scareme.profile.presentation.ErrorScreen
-import com.example.scareme.profile.presentation.LoadingScreen
-import com.example.scareme.profile.presentation.ShowProfileUiState
-import com.example.scareme.profile.presentation.ShowProfileViewModel
-import com.example.scareme.profile.presentation.SuccessScreen
 import com.example.scareme.userScreen.data.model.UserData
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
@@ -57,13 +63,39 @@ fun TinderCardWindow(
 ){
 
     when(userUiState){
-        is UserUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
+        is UserUiState.Loading -> UserLoadingScreen(modifier = modifier.fillMaxSize())
         is UserUiState.Success -> SwipeUserScreen(
             userInformation =  userUiState.user, viewModel = viewModel ,  modifier = modifier.fillMaxWidth()
         )
-        is UserUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+        is UserUiState.Error -> UserErrorScreen(retryAction, modifier = modifier.fillMaxSize())
     }
 
+}
+@Composable
+fun UserLoadingScreen(modifier: Modifier = Modifier) {
+    Image(
+        modifier = modifier.size(200.dp),
+        painter = painterResource(R.drawable.loading_img),
+        contentDescription = null
+    )
+}
+
+@Composable
+fun UserErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
+        )
+        Text(text = ("Loading Failed"),
+            modifier = Modifier.padding(16.dp))
+        Button(onClick = retryAction) {
+            Text("Retry")
+        }
+    }
 }
 
 

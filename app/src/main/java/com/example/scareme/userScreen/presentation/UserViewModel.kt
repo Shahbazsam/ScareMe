@@ -10,7 +10,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.scareme.SaveTokenUtil
 import com.example.scareme.ScareMeApplication
+import com.example.scareme.TokenRepository
 import com.example.scareme.userScreen.data.UserRepository
 import com.example.scareme.userScreen.data.model.UserData
 import kotlinx.coroutines.launch
@@ -26,50 +28,31 @@ sealed interface UserUiState {
 
 class UserViewModel(
     private val userRepository: UserRepository,
-    private val application: Application
+    private val tokenRepository: TokenRepository
 ) : ViewModel() {
 
     var userUiState: UserUiState by mutableStateOf(UserUiState.Loading)
         private set
 
-    private var _token: String? = null
-    val token: String
-        get() {
-            if (_token == null) {
-                _token = findToken()
-            }
-            return _token ?: throw IllegalStateException("Token not found in SharedPreferences")
-        }
+    private val token : String
+        get() =  tokenRepository.getToken()
 
     init {
-        viewModelScope.launch {
-            _token = findToken()
-            if (_token != null) {
-                getUserDetails()
-            } else {
-                userUiState = UserUiState.Error // or navigate to login
-            }
-        }
+        getUserDetails()
     }
-    private fun findToken(): String? {
-        val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-        return sharedPref.getString("token", null)
-    }
-
 
     fun likeUser(userId: String) {
         viewModelScope.launch {
-            token.let {
-                userRepository.likeUser(it, userId)
-            }
+
+                userRepository.likeUser(token , userId)
         }
     }
 
     fun dislikeUser(userId: String) {
         viewModelScope.launch {
-            token.let {
-                userRepository.dislikeUser(it, userId)
-            }
+
+                userRepository.dislikeUser(token, userId)
+
         }
     }
 
@@ -96,7 +79,7 @@ class UserViewModel(
                 val userRepository = application.userContainer.userRepository
                 UserViewModel(
                     userRepository = userRepository,
-                    application = application
+                    tokenRepository = application.tokenRepository
                     )
             }
         }

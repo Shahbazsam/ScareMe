@@ -120,7 +120,7 @@ fun ProfileScreen(
         // About TextField
         TextField(
             value = state.aboutMyself,
-            onValueChange = { /* Handle About Change */ },
+            onValueChange = { viewModel.onEvent(ProfileEvent.aboutMyselfChanged(it)) },
             modifier = Modifier
                 .padding(8.dp)
                 .size(width = 370.dp, height = 152.dp)

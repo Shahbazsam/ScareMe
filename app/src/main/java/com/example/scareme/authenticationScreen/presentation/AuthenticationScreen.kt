@@ -59,6 +59,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
                             "Registration Successful",
                             Toast.LENGTH_LONG
                         ).show()
+                        navController.navigate(ProfileInputScreen)
                     }
                 }
             }
@@ -180,7 +181,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
         Button(
             onClick = {
                     viewModel.onEvent(RegistrationFormEvent.Submit)
-                    navController.navigate(ProfileInputScreen)
+
             },
             modifier = Modifier
                 .offset(y = 450.dp)

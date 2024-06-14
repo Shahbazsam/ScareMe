@@ -17,11 +17,13 @@ class ScareMeApplication : Application() {
     lateinit var container2 : SignInAppContainer
     lateinit var profileContainer : ProfileContainer
     lateinit var userContainer: UserContainer
+    lateinit var tokenRepository: TokenRepository
     override fun onCreate() {
         super.onCreate()
         container = DefaultContainer()
         container2 = DefaultSignInContainer()
         profileContainer = DefaultProfileContainer()
         userContainer = DefaultUserContainer()
+        tokenRepository = TokenRepository()
     }
 }

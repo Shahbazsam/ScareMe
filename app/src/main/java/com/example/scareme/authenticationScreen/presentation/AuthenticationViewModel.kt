@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.scareme.SaveTokenUtil
 import com.example.scareme.ScareMeApplication
 import com.example.scareme.authenticationScreen.data.AuthRegisterRepository
 import com.example.scareme.authenticationScreen.data.model.UserData
@@ -79,13 +80,7 @@ class AuthenticationViewModel(
 
                 val token = authRegisterRepository.getRegistered(userData)
 
-                // Save token into shared preferences
-                val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-                with(sharedPref.edit()) {
-                    putString("token", token.accessToken)
-                    apply()
-                }
-
+                SaveTokenUtil.saveToken(application , token.accessToken)
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }

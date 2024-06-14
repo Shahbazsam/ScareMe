@@ -10,5 +10,5 @@ data class UserData(
     val name : String,
     val aboutMyself : String?,
     val avatar: String?,
-    val topics : List<Topics>
+    val topics : List<Topics>?
 )

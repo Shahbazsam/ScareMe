@@ -11,7 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.scareme.SaveTokenUtil
 import com.example.scareme.ScareMeApplication
+import com.example.scareme.TokenRepository
 import com.example.scareme.authenticationScreen.presentation.AuthenticationViewModel
 import com.example.scareme.signInScreen.data.SignInRepository
 import com.example.scareme.signInScreen.data.model.UserData
@@ -25,7 +27,7 @@ class SignInViewModel(
     private val validateEmail: ValidateEmail = ValidateEmail(),
     private val validatePassword: ValidatePassword = ValidatePassword(),
     private val signInRepository: SignInRepository,
-    private val application: Application
+    private val tokenRepository: TokenRepository
 ) : ViewModel() {
 
     var state by mutableStateOf(SignInFormState())
@@ -73,11 +75,7 @@ class SignInViewModel(
                 val token = signInRepository.getRegistered(userData)
                 Log.d("token" , {"${token.accessToken}"}.toString())
 
-                val sharedPref = application.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
-                with(sharedPref.edit()){
-                    putString("token", token.accessToken)
-                    apply()
-                }
+               tokenRepository.setToken(token.accessToken)
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }
@@ -90,7 +88,7 @@ class SignInViewModel(
                 val signInRepository = application.container2.signInRepository
                 SignInViewModel(
                     signInRepository = signInRepository,
-                    application = application
+                    tokenRepository = application.tokenRepository
                     )
             }
         }

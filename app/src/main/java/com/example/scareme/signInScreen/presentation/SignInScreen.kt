@@ -59,10 +59,10 @@ fun SignInScreen(
                     is SignInViewModel.ValidationEvent.Success ->{
                         Toast.makeText(
                             context,
-                            "Registration Successful",
+                            "SignIn Successful",
                             Toast.LENGTH_LONG
                         ).show()
-                        navController.navigate(TinderNav)
+
                     }
                 }
             }
@@ -150,6 +150,7 @@ fun SignInScreen(
         Button(
             onClick = {
                       viewModel.onEvent(SignInFormEvent.Submit)
+                navController.navigate(TinderNav)
             },
             modifier = Modifier
                 .offset(y = 450.dp)
@@ -160,7 +161,7 @@ fun SignInScreen(
 
         ) {
             Text(
-                text = "Sign up",
+                text = "Sign In",
                 color = Color.Black,
                 fontWeight = FontWeight.Bold
             )
