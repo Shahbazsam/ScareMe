@@ -1,6 +1,5 @@
 package com.example.scareme.userScreen.data
 
-import com.example.scareme.profile.network.ProfileApiService
 import com.example.scareme.userScreen.network.UserApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -8,7 +7,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 interface UserContainer{
     val userRepository : UserRepository
@@ -17,6 +15,11 @@ interface UserContainer{
 class DefaultUserContainer() : UserContainer{
 
     private val baseUrl = "http://itindr.mcenter.pro:8092/api/mobile/v1/"
+
+    private val json = Json{
+        ignoreUnknownKeys = true
+    }
+
     private val interceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -25,7 +28,7 @@ class DefaultUserContainer() : UserContainer{
     private val retrofit : Retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(client)
-        .addConverterFactory( GsonConverterFactory.create())
+        .addConverterFactory( json.asConverterFactory("application/json".toMediaType()))
         .build()
 
     private val retrofitService : UserApiService by lazy {

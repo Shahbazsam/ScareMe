@@ -9,11 +9,9 @@ import retrofit2.http.Query
 
 interface UserApiService {
 
-    @GET("user")
+    @GET("user/feed")
     suspend fun getUsers(
         @Header("Authorization") token : String,
-        @Query("limit") limit : Int = 10,
-        @Query("offset") offset : Int = 0
     ) : List<UserData>
 
     @POST("user/{userId}/like")

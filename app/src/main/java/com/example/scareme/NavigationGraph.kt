@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.scareme.authenticationScreen.presentation.AuthenticationScreen
+import com.example.scareme.chat.presentation.ChatListScreen
 import com.example.scareme.profile.presentation.ProfileScreen
 import com.example.scareme.profile.presentation.ProfileUiState
 import com.example.scareme.profile.presentation.ProfileViewModel
@@ -66,8 +67,18 @@ val contentPadding  = PaddingValues(0.dp)
                     BottomNavigationBar (
                         onItemClick = { clickedIndex ->
                             when(clickedIndex){
-                                0 -> navController.navigate(TinderNav)
-                                2 -> navController.navigate(ShowProfileNav)
+                                0 -> {
+                                    app.userViewModel.getUserDetails()
+                                    navController.navigate(TinderNav)
+                                }
+                                1->{
+                                    app.chatListViewModel.getChatList()
+                                    navController.navigate(ChatListNav)
+                                }
+                                2 -> {
+                                    app.showProfileViewModel.getUserInformation()
+                                    navController.navigate(ShowProfileNav)
+                                }
                             }
                         }
                     )
@@ -88,21 +99,62 @@ val contentPadding  = PaddingValues(0.dp)
                     BottomNavigationBar (
                         onItemClick = { clickedIndex ->
                             when(clickedIndex){
-                                0 -> navController.navigate(TinderNav)
-                                2 -> navController.navigate(ShowProfileNav)
+                                0 -> {
+                                    app.userViewModel.getUserDetails()
+                                    navController.navigate(TinderNav)
+                                    }
+                                1->{
+                                    app.chatListViewModel.getChatList()
+                                    navController.navigate(ChatListNav)
+                                }
+                                2 -> {
+                                    app.showProfileViewModel.getUserInformation()
+                                    navController.navigate(ShowProfileNav)
+                                    }
                             }
                         }
                     )
                 }
             ){innerPadding ->
                ShowProfileScreen(
+                   viewModel = app.showProfileViewModel,
                    retryAction = {} ,
                    modifier = Modifier.padding(innerPadding)
                )
 
             }
         }
+        composable<ChatListNav> {
+            Scaffold (
+                bottomBar = {
+                    BottomNavigationBar (
+                        onItemClick = { clickedIndex ->
+                            when(clickedIndex){
+                                0 -> {
+                                    app.userViewModel.getUserDetails()
+                                    navController.navigate(TinderNav)
+                                }
+                                1->{
+                                    app.chatListViewModel.getChatList()
+                                    navController.navigate(ChatListNav)
+                                }
+                                2 -> {
+                                    app.showProfileViewModel.getUserInformation()
+                                    navController.navigate(ShowProfileNav)
+                                }
+                            }
+                        }
+                    )
+                }
+            ){innerPadding ->
+                ChatListScreen(
+                    viewModel = app.chatListViewModel,
+                    retryAction = {  },
+                    modifier = Modifier.padding(innerPadding)
+                )
 
+            }
+        }
 
     }
 
@@ -123,3 +175,5 @@ object TinderNav
 
 @Serializable
 object ShowProfileNav
+@Serializable
+object ChatListNav

@@ -1,6 +1,13 @@
 package com.example.scareme.profile.presentation
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,7 +16,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +46,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,10 +58,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.scareme.MockDataRepo.MockProfileRepository
-import com.example.scareme.ProfileInputScreen
 import com.example.scareme.R
+import com.example.scareme.ScareMeApplication
 import com.example.scareme.TinderNav
-import com.example.scareme.authenticationScreen.presentation.AuthenticationViewModel
 import com.example.scareme.profile.data.model.Topics
 import com.example.scareme.ui.theme.textColor
 
@@ -70,9 +77,13 @@ fun ProfileScreen(
     val uiState by viewModel.profileUiState.collectAsState()
 
     val profileUiState = uiState
-
-
     val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            viewModel.onEvent(ProfileEvent.ImageSelected(it))
+        }
+    }
+
     LaunchedEffect(key1 = context) {
         viewModel.validationEvents.collect{event ->
             when(event){
@@ -106,7 +117,39 @@ fun ProfileScreen(
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
-            Image(
+        Box(
+            Modifier
+                .offset(x = 0.dp, y = 5.dp)
+                .padding(8.dp)
+                .size(190.dp, 190.dp)
+                .border(BorderStroke(4.dp, Color(0xFFF6921D)), CircleShape)
+                .clip(CircleShape)
+                .clickable { launcher.launch("image/*") }
+        ) {
+            // Display the selected image from the viewModel
+            var imageUri = viewModel.selectedImageUri
+            if (imageUri != null) {
+                val bitmap = getBitmapFromUri(context, imageUri)
+                bitmap?.let {
+                    Image(
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = "Avatar photo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            } else {
+
+                Image(
+                    painter = painterResource(id = R.drawable.profile),
+                    contentDescription = "Avatar photo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+
+          /*  Image(
                 modifier = Modifier
                     .offset(x = 0.dp, y = 5.dp)
                     .padding(8.dp)
@@ -115,7 +158,7 @@ fun ProfileScreen(
                     .clickable { },
                 painter = painterResource(id = R.drawable.profile),
                 contentDescription = null
-            )
+            )*/
 
         // Name TextField
         TextField(
@@ -184,7 +227,7 @@ fun ProfileScreen(
             when (profileUiState){
                 is ProfileUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxSize())
                 is ProfileUiState.Success -> TopicScreen(
-                    profileUiState.topics , contentPadding = contentPadding , modifier = Modifier.fillMaxWidth()
+                    profileUiState.topics ,viewModel, contentPadding = contentPadding , modifier = Modifier.fillMaxWidth()
                 )
                 is ProfileUiState.Error -> ErrorScreen(retryAction  , modifier = Modifier.fillMaxSize())
 
@@ -212,9 +255,12 @@ fun ProfileScreen(
     }
 }
 
+
+
 @Composable
 fun TopicScreen(
     topics : List<Topics> ,
+    viewModel: ProfileViewModel,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ){
@@ -222,7 +268,7 @@ fun TopicScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(160.dp)
     ) {
         items(topics.chunked(3)){topic ->
             LazyRow(
@@ -232,12 +278,15 @@ fun TopicScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 items(topic){topic ->
-                    var isSelected by remember { mutableStateOf(false) }
-                    TopicButton(
-                        topicTitle = topic.title  ,
-                        isSelected = isSelected,
-                        onClick = { isSelected = !isSelected }
-                    )
+                    val isSelected = viewModel.state.topics?.contains(topic.id)
+                    if (isSelected != null) {
+                        TopicButton(
+                            topicTitle = topic.title  ,
+                            topicId = topic.id,
+                            isSelected = isSelected,
+                            onClick = { viewModel.onEvent(ProfileEvent.TopicsSelected(topic.id)) }
+                        )
+                    }
 
                 }
 
@@ -247,7 +296,7 @@ fun TopicScreen(
 }
 
 @Composable
-fun TopicButton(topicTitle: String,isSelected: Boolean, onClick: () -> Unit) {
+fun TopicButton(topicTitle: String,topicId: String,isSelected: Boolean, onClick: () -> Unit) {
     val backgroundColor = if (isSelected) Color(0xFFFFA500) else Color.Black
     val textColor = if (isSelected) Color.Black else Color(0xFFFFA500)
     val borderColor = if (isSelected) Color.Transparent else Color(0xFFFFA500)
@@ -288,16 +337,23 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
         }
     }
 }
+fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+    return context.contentResolver.openInputStream(uri)?.use { inputStream ->
+        BitmapFactory.decodeStream(inputStream)
+    }
+}
 
-
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun DefaultProfilePreview() {
     val mockRepository = MockProfileRepository()
-    val viewModel = ProfileViewModel(profileRepository = mockRepository)
+    val viewModel = ProfileViewModel(
+        profileRepository = mockRepository,
+        context =
+    )
     ProfileScreen(
         navController = rememberNavController(),
         retryAction = {  },
         viewModel = viewModel
     )
-}
+}*/

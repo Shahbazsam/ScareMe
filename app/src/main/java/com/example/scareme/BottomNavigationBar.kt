@@ -6,8 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,12 +20,12 @@ import androidx.compose.ui.unit.dp
 
 data class BottomNavigationItem(
     val selectedIcon: Int,
-    val unselectedIcon: Int ,
+    val unselectedIcon: Int,
 )
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun BottomNavigationBar(onItemClick : (Int) -> Unit) {
+fun BottomNavigationBar(onItemClick: (Int) -> Unit) {
     val items = listOf(
         BottomNavigationItem(
             selectedIcon = R.drawable.selected_tinder,
@@ -45,68 +43,63 @@ fun BottomNavigationBar(onItemClick : (Int) -> Unit) {
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(0)
     }
-    Scaffold(
-        bottomBar = {
-            NavigationBar(
-                containerColor = Color.Black
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Black),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    items.forEachIndexed { index, item ->
-                        val isSelected = selectedItemIndex == index
 
+    NavigationBar(
+        containerColor = Color.Black
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items.forEachIndexed { index, item ->
+                val isSelected = selectedItemIndex == index
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 8.dp)
+                        .clickable {
+                            selectedItemIndex = index
+                            onItemClick(index)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isSelected) {
                         Box(
                             modifier = Modifier
-                                .weight(1f)
-                                .padding(vertical = 8.dp)
-                                .clickable {
-                                    selectedItemIndex = index
-                                    onItemClick(index)
-                                           },
+                                .size(70.dp)
+                                .background(Color.Black),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (isSelected) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(70.dp)
-                                        .background(Color.Black), // Set the background color to black
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = item.selectedIcon),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(64.dp)
-                                    )
-                                }
-                            } else {
-                                // Empty box for unselected items
-                                Box(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .background(Color.Black), // Set the background color to black
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = item.unselectedIcon),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(64.dp)
-                                    )
-                                }
-                            }
+                            Image(
+                                painter = painterResource(id = item.selectedIcon),
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp)
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(Color.Black),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = item.unselectedIcon),
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp)
+                            )
                         }
                     }
                 }
             }
         }
-    ) {
-
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

@@ -2,6 +2,7 @@ package com.example.scareme.profile.presentation
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,7 +21,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface ShowProfileUiState{
-    data class Success(val userInformation  : List<UserInformation>) : ShowProfileUiState
+    data class Success(val userInformation  : UserInformation) : ShowProfileUiState
     object Error : ShowProfileUiState
     object Loading : ShowProfileUiState
 }
@@ -45,8 +46,9 @@ class ShowProfileViewModel(
         viewModelScope.launch {
             _showProfileUiState.value = ShowProfileUiState.Loading
              try {
-                val userInfo = profileRepository.getUserProfile(token)
+                val userInfo = profileRepository.getUserProfile("Bearer $token")
                 _showProfileUiState.value = ShowProfileUiState.Success(userInfo)
+                 Log.d("ShowProfileViewModel", "State updated to Success: $userInfo") // Add logging
             }catch (e : IOException){
                 _showProfileUiState.value = ShowProfileUiState.Error
             }catch (e: HttpException){

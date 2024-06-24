@@ -9,7 +9,7 @@ import okhttp3.OkHttpClient.Builder
 
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+
 
 interface ProfileContainer {
     val profileRepository : ProfileRepository
@@ -18,13 +18,20 @@ interface ProfileContainer {
 class DefaultProfileContainer : ProfileContainer{
 
     private val baseUrl = "http://itindr.mcenter.pro:8092/api/mobile/v1/"
-    private val interceptor = HttpLoggingInterceptor()
+
+    private val json = Json{
+        ignoreUnknownKeys = true
+    }
+
+    private val interceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
     private val client : OkHttpClient = Builder().addInterceptor(interceptor).build()
 
     private val retrofit : Retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(client)
-        .addConverterFactory( Json.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory( json.asConverterFactory("application/json".toMediaType()))
         .build()
 
     private val retrofitService : ProfileApiService by lazy {

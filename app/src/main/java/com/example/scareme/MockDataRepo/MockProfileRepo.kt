@@ -5,7 +5,7 @@ import com.example.scareme.profile.data.model.Topics
 import com.example.scareme.profile.data.model.UserInformation
 import com.example.scareme.profile.data.model.UserInformationToSend
 import com.example.scareme.profile.network.ProfileApiService
-
+import okhttp3.MultipartBody
 
 
 class MockProfileRepository(
@@ -18,8 +18,8 @@ class MockProfileRepository(
             // ... add more fake topics
         )
     }
-    override suspend fun getUserProfile(token: String) : List<UserInformation> {
-        return listOf(
+    override suspend fun getUserProfile(token: String) : UserInformation {
+        val info =
             UserInformation(
                 userId = "123",
                 name = "sam",
@@ -31,9 +31,12 @@ class MockProfileRepository(
                     // ... add more fake topics
                 )
             )
-        )
+        return info
     }
 
+    override suspend fun updateAvatar(token: String, uri: MultipartBody.Part) {
+        TODO("Not yet implemented")
+    }
     override suspend fun updateUserProfile(token: String, userInformation: UserInformationToSend) {
 
     }

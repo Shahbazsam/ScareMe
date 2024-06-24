@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.scareme.ScareMeApplication
+import com.example.scareme.chat.presentation.ChatListViewModel
 import com.example.scareme.profile.presentation.ShowProfileViewModel
 import com.example.scareme.signInScreen.data.SignInRepository
 import com.example.scareme.signInScreen.data.model.UserData
@@ -25,7 +26,8 @@ class SignInViewModel(
     private val validatePassword: ValidatePassword = ValidatePassword(),
     private val signInRepository: SignInRepository,
     val userViewModel: UserViewModel,
-    val showProfileViewModel: ShowProfileViewModel
+    val showProfileViewModel: ShowProfileViewModel,
+    val chatListViewModel: ChatListViewModel
 
 ) : ViewModel() {
 
@@ -74,6 +76,7 @@ class SignInViewModel(
                 val token = signInRepository.getSignedIn(userData)
                 userViewModel.onTokenAvailable(token.accessToken)
                 showProfileViewModel.onTokenAvailable(token.accessToken)
+                chatListViewModel.onTokenAvailable(token.accessToken)
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }
@@ -87,7 +90,8 @@ class SignInViewModel(
                 SignInViewModel(
                     signInRepository = signInRepository,
                     userViewModel = application.userViewModel,
-                    showProfileViewModel = application.showProfileViewModel
+                    showProfileViewModel = application.showProfileViewModel,
+                    chatListViewModel = application.chatListViewModel
                     )
             }
         }

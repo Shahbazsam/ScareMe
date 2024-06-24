@@ -15,6 +15,7 @@ import com.example.scareme.authenticationScreen.data.model.UserData
 import com.example.scareme.authenticationScreen.domain.use_case.ValidateEmail
 import com.example.scareme.authenticationScreen.domain.use_case.ValidatePassword
 import com.example.scareme.authenticationScreen.domain.use_case.ValidateRepeatedPassword
+import com.example.scareme.chat.presentation.ChatListViewModel
 import com.example.scareme.profile.presentation.ProfileViewModel
 import com.example.scareme.profile.presentation.ShowProfileViewModel
 import com.example.scareme.userScreen.presentation.UserViewModel
@@ -29,7 +30,8 @@ class AuthenticationViewModel(
     private val authRegisterRepository: AuthRegisterRepository,
     val profileViewModel: ProfileViewModel,
     val userViewModel: UserViewModel,
-    val showProfileViewModel: ShowProfileViewModel
+    val showProfileViewModel: ShowProfileViewModel,
+    val chatListViewModel: ChatListViewModel
 ) : ViewModel() {
 
     var state by mutableStateOf(RegistrationFormState())
@@ -85,6 +87,7 @@ class AuthenticationViewModel(
                 profileViewModel.onTokenAvailable(token.accessToken)
                 userViewModel.onTokenAvailable(token.accessToken)
                 showProfileViewModel.onTokenAvailable(token.accessToken)
+                chatListViewModel.onTokenAvailable(token.accessToken)
                 validationEventChannel.send(ValidationEvent.Success)
             }
         }
@@ -99,7 +102,8 @@ class AuthenticationViewModel(
                     authRegisterRepository = authRegisterRepository,
                     profileViewModel =application.profileViewModel,
                     userViewModel = application.userViewModel,
-                    showProfileViewModel = application.showProfileViewModel
+                    showProfileViewModel = application.showProfileViewModel,
+                    chatListViewModel = application.chatListViewModel
                     )
             }
         }

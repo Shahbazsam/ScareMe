@@ -39,14 +39,16 @@ class UserViewModel(
     fun likeUser(userId: String) {
         viewModelScope.launch {
 
-                userRepository.likeUser(token , userId)
+                userRepository.likeUser("Bearer $token" , userId)
+                getUserDetails()
         }
     }
 
     fun dislikeUser(userId: String) {
         viewModelScope.launch {
 
-                userRepository.dislikeUser(token, userId)
+                userRepository.dislikeUser("Bearer $token", userId)
+                getUserDetails()
 
         }
     }

@@ -11,25 +11,33 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,39 +51,69 @@ import com.example.scareme.profile.data.model.UserInformation
 
 @Composable
 fun ShowProfileScreen(
+    viewModel: ShowProfileViewModel,
     retryAction: () -> Unit,
     modifier: Modifier = Modifier
 ){
 
 
-    val viewModel : ShowProfileViewModel = viewModel(factory = ShowProfileViewModel.Factory)
+    //val viewModel : ShowProfileViewModel = viewModel(factory = ShowProfileViewModel.Factory)
     val uiState by  viewModel.showProfileUiState.collectAsState()
 
     val showProfileUiState = uiState
 
     when(showProfileUiState){
-        is ShowProfileUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
+        is ShowProfileUiState.Loading -> LoadingProfileScreen(modifier = modifier.fillMaxSize())
         is ShowProfileUiState.Success -> SuccessScreen(
            userInformation =  showProfileUiState.userInformation,  modifier = modifier.fillMaxWidth()
         )
-        is ShowProfileUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+        is ShowProfileUiState.Error -> ErrorProfileScreen(retryAction, modifier = modifier.fillMaxSize())
     }
-
-
 }
 
 @Composable
-fun SuccessScreen(userInformation: List<UserInformation>, modifier: Modifier = Modifier){
+fun LoadingProfileScreen(modifier: Modifier = Modifier) {
+    Image(
+        modifier = modifier.size(80.dp),
+        painter = painterResource(R.drawable.loading_img),
+        contentDescription = null
+    )
+}
 
-    val user = userInformation.firstOrNull()
+@Composable
+fun ErrorProfileScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
+        )
+        Text(text = ("Loading Failed"),
+            modifier = Modifier.padding(16.dp))
+        Button(onClick = retryAction) {
+            Text("Retry")
+        }
+    }
+}
+
+
+
+@Composable
+fun SuccessScreen(userInformation: UserInformation, modifier: Modifier = Modifier){
+
+    val user = userInformation
     Column(modifier = Modifier
         .fillMaxSize()
         .background(color = Color.Black),
         //verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box {
-
+        Box (
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ){
 
             Image(
                 modifier = Modifier
@@ -87,8 +125,9 @@ fun SuccessScreen(userInformation: List<UserInformation>, modifier: Modifier = M
             user?.let {
                 AsyncImage(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .size(width = 400.dp, height = 370.dp),
+                        .size(200.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, Color.White, CircleShape),
                     model = ImageRequest.Builder(context = LocalContext.current )
                         .data(it.avatar)
                         .crossfade(true)
@@ -96,7 +135,18 @@ fun SuccessScreen(userInformation: List<UserInformation>, modifier: Modifier = M
                     error = painterResource(R.drawable.ic_broken_image),
                     placeholder = painterResource(R.drawable.loading_img),
                     contentScale = ContentScale.Crop,
-                    contentDescription = null
+                    contentDescription = null,
+                )
+            }
+            user?.let {
+                Text(
+                    text = it.name ?: "" ,
+                    color = Color.White,
+                    fontSize = 38.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .offset(y = 140.dp)
                 )
             }
         }
@@ -114,7 +164,7 @@ fun SuccessScreen(userInformation: List<UserInformation>, modifier: Modifier = M
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .offset(x = 23.dp, y = 21.dp)
-                    .size(width = 314.dp, height = 61.dp)
+                    .size(width = 354.dp, height = 101.dp)
 
             ){
                 Text(
@@ -141,6 +191,7 @@ fun SuccessScreen(userInformation: List<UserInformation>, modifier: Modifier = M
 
 @Composable
 fun ShowTopics(topics: List<Topics>?) {
+
     if (topics.isNullOrEmpty()) {
         Text(
             text = "No topics available",
@@ -149,37 +200,42 @@ fun ShowTopics(topics: List<Topics>?) {
             modifier = Modifier.padding(16.dp)
         )
     } else {
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Adaptive(60.dp),
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalItemSpacing = 12.dp,
-            content = {
-                items(topics) { topic ->
-                    TopicButtons(
-                        topicTitle = topic.title,
-                        onClick = { /* Handle onClick */ }
-                    )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)
+        ) {
+            items(topics.chunked(4)){topic ->
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    items(topic){topic ->
+
+                            TopicButtons(
+                                topicTitle = topic.title  ,
+                            )
+                    }
+
                 }
             }
-        )
+        }
     }
 }
-
-
 @Composable
-fun TopicButtons(topicTitle: String, onClick: () -> Unit) {
+fun TopicButtons(topicTitle: String) {
     val backgroundColor =  Color(0xFFFFA500)
     val textColor =  Color.Black
-    val borderColor = Color.Transparent
+    val borderColor =  Color.Transparent
 
     Box(
         modifier = Modifier
             .wrapContentSize()
             .background(backgroundColor, RoundedCornerShape(16.dp))
             .border(1.5.dp, borderColor, RoundedCornerShape(16.dp))
-            .clickable { onClick() }
+            .clickable { }
             .padding(horizontal = 6.dp, vertical = 6.dp)
     ) {
         Text(text = topicTitle, color = textColor)
@@ -187,14 +243,11 @@ fun TopicButtons(topicTitle: String, onClick: () -> Unit) {
 }
 
 
-
-
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     SuccessScreen(
-        userInformation = listOf(
+        userInformation =
             UserInformation(
                 userId = "hhgghhhg",
                 name = "John Doe",
@@ -207,5 +260,4 @@ fun DefaultPreview() {
                 )
             )
         )
-    )
 }
