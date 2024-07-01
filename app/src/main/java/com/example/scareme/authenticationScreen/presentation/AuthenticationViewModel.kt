@@ -77,18 +77,23 @@ class AuthenticationViewModel(
         }
         if(!hasError){
             viewModelScope.launch {
-                val userData = UserData(
-                    email = state.email,
-                    password = state.password
-                )
+                try {
+                    val userData = UserData(
+                        email = state.email,
+                        password = state.password
+                    )
 
-                val token = authRegisterRepository.getRegistered(userData)
+                    val token = authRegisterRepository.getRegistered(userData)
 
-                profileViewModel.onTokenAvailable(token.accessToken)
-                userViewModel.onTokenAvailable(token.accessToken)
-                showProfileViewModel.onTokenAvailable(token.accessToken)
-                chatListViewModel.onTokenAvailable(token.accessToken)
-                validationEventChannel.send(ValidationEvent.Success)
+                    profileViewModel.onTokenAvailable(token.accessToken)
+                    userViewModel.onTokenAvailable(token.accessToken)
+                    showProfileViewModel.onTokenAvailable(token.accessToken)
+                    chatListViewModel.onTokenAvailable(token.accessToken)
+                    validationEventChannel.send(ValidationEvent.Success)
+                }catch (e: Exception) {
+                    validationEventChannel.send(ValidationEvent.Error(e.message ?: "Registration failed"))
+                }
+
             }
         }
     }
@@ -112,6 +117,7 @@ class AuthenticationViewModel(
 
     sealed class ValidationEvent {
         object Success  : ValidationEvent()
+        data class Error(val message: String) : ValidationEvent()
 
     }
 

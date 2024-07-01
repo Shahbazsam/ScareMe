@@ -173,10 +173,7 @@ val contentPadding  = PaddingValues(0.dp)
 
             }
         }
-
     }
-
-
 }
 @Serializable
 object ScreenSplash

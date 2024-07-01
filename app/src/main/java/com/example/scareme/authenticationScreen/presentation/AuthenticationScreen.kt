@@ -61,6 +61,9 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
                         ).show()
                         navController.navigate(ProfileInputScreen)
                     }
+                    is AuthenticationViewModel.ValidationEvent.Error -> {
+                        Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }

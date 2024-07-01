@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.scareme.ScareMeApplication
+import com.example.scareme.authenticationScreen.presentation.AuthenticationViewModel
 import com.example.scareme.chat.presentation.ChatListViewModel
 import com.example.scareme.profile.presentation.ShowProfileViewModel
 import com.example.scareme.signInScreen.data.SignInRepository
@@ -68,16 +69,21 @@ class SignInViewModel(
         }
         if(!hasError){
             viewModelScope.launch {
-                val userData = UserData(
-                    email = state.email,
-                    password = state.password
-                )
+                try {
+                    val userData = UserData(
+                        email = state.email,
+                        password = state.password
+                    )
 
-                val token = signInRepository.getSignedIn(userData)
-                userViewModel.onTokenAvailable(token.accessToken)
-                showProfileViewModel.onTokenAvailable(token.accessToken)
-                chatListViewModel.onTokenAvailable(token.accessToken)
-                validationEventChannel.send(ValidationEvent.Success)
+                    val token = signInRepository.getSignedIn(userData)
+                    userViewModel.onTokenAvailable(token.accessToken)
+                    showProfileViewModel.onTokenAvailable(token.accessToken)
+                    chatListViewModel.onTokenAvailable(token.accessToken)
+                    validationEventChannel.send(ValidationEvent.Success)
+                }catch (e: Exception) {
+                    validationEventChannel.send(ValidationEvent.Error(e.message ?: "Registration failed"))
+                }
+
             }
         }
 
@@ -100,7 +106,7 @@ class SignInViewModel(
 
     sealed class ValidationEvent {
         object Success  : ValidationEvent()
-
+        data class Error(val message: String) : ValidationEvent()
     }
 
 }

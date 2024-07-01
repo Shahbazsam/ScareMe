@@ -64,6 +64,9 @@ fun SignInScreen(
                         ).show()
                         navController.navigate(TinderNav)
                     }
+                    is SignInViewModel.ValidationEvent.Error -> {
+                        Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }
