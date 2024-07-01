@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
-
+var USERID = ""
 sealed interface ShowProfileUiState{
     data class Success(val userInformation  : UserInformation) : ShowProfileUiState
     object Error : ShowProfileUiState
@@ -47,6 +47,7 @@ class ShowProfileViewModel(
             _showProfileUiState.value = ShowProfileUiState.Loading
              try {
                 val userInfo = profileRepository.getUserProfile("Bearer $token")
+                 USERID = userInfo.userId
                 _showProfileUiState.value = ShowProfileUiState.Success(userInfo)
                  Log.d("ShowProfileViewModel", "State updated to Success: $userInfo") // Add logging
             }catch (e : IOException){

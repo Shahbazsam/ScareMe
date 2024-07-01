@@ -62,7 +62,7 @@ fun SignInScreen(
                             "SignIn Successful",
                             Toast.LENGTH_LONG
                         ).show()
-
+                        navController.navigate(TinderNav)
                     }
                 }
             }
@@ -106,6 +106,9 @@ fun SignInScreen(
             )
             if(state.emailError != null){
                 Text(
+                    modifier = Modifier
+
+                        .offset(y = 154.dp),
                     text = state.emailError,
                     color =  Color(0xFFFFA500)
                 )
@@ -119,7 +122,7 @@ fun SignInScreen(
             isError = state.passwordError != null,
             modifier = Modifier
                 .size(width = 370.dp, height = 72.dp)
-                .offset(y = 174.dp)
+                .offset(y = 164.dp)
                 .fillMaxWidth(),
             placeholder = {
                 Text(text = "Password")
@@ -141,19 +144,21 @@ fun SignInScreen(
         )
         if(state.passwordError != null){
             Text(
+                modifier = Modifier
+                    .offset(y = 164.dp),
                 text = state.passwordError,
                 color =  Color(0xFFFFA500)
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(86.dp))
         Button(
             onClick = {
                       viewModel.onEvent(SignInFormEvent.Submit)
-                navController.navigate(TinderNav)
+
             },
             modifier = Modifier
-                .offset(y = 450.dp)
+                .offset(y = 430.dp)
                 .size(width = 370.dp, height = 64.dp)
                 .fillMaxWidth(),
             colors = ButtonDefaults.outlinedButtonColors( Color(0xFFFFA500)),

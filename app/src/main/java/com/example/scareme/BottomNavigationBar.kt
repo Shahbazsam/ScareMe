@@ -1,6 +1,7 @@
 package com.example.scareme
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,7 +26,10 @@ data class BottomNavigationItem(
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun BottomNavigationBar(onItemClick: (Int) -> Unit) {
+fun BottomNavigationBar(
+    currentSelectedItemIndex: Int,
+    onItemClick: (Int) -> Unit
+) {
     val items = listOf(
         BottomNavigationItem(
             selectedIcon = R.drawable.selected_tinder,
@@ -41,7 +45,7 @@ fun BottomNavigationBar(onItemClick: (Int) -> Unit) {
         )
     )
     var selectedItemIndex by rememberSaveable {
-        mutableStateOf(0)
+        mutableStateOf(currentSelectedItemIndex)
     }
 
     NavigationBar(
@@ -62,47 +66,30 @@ fun BottomNavigationBar(onItemClick: (Int) -> Unit) {
                         .weight(1f)
                         .padding(vertical = 8.dp)
                         .clickable {
+                            Log.d("BottomBar", "Before update: $selectedItemIndex")
                             selectedItemIndex = index
+                            Log.d("BottomBar", "After update: $selectedItemIndex")
                             onItemClick(index)
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isSelected) {
-                        Box(
-                            modifier = Modifier
-                                .size(70.dp)
-                                .background(Color.Black),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = item.selectedIcon),
-                                contentDescription = null,
-                                modifier = Modifier.size(64.dp)
-                            )
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(Color.Black),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = item.unselectedIcon),
-                                contentDescription = null,
-                                modifier = Modifier.size(64.dp)
-                            )
-                        }
-                    }
+                    val icon = if (isSelected) item.selectedIcon else item.unselectedIcon
+                    Image(
+                        painter = painterResource(id = icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(if (isSelected) 64.dp else 40.dp)
+                    )
                 }
+
             }
         }
     }
 }
 
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun BottomNavigationBarTheme() {
     BottomNavigationBar(onItemClick = {})
-}
+}*/

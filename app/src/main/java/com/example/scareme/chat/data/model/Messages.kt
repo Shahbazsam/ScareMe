@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
 data class Messages(
     val id :String?,
     val text : String?,
+    val createdAt : String,
     val user : User
 )

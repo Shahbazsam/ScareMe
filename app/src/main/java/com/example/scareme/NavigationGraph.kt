@@ -4,14 +4,19 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.scareme.authenticationScreen.presentation.AuthenticationScreen
 import com.example.scareme.chat.presentation.ChatListScreen
+import com.example.scareme.chat.presentation.MessagingScreen
 import com.example.scareme.profile.presentation.ProfileScreen
 import com.example.scareme.profile.presentation.ProfileUiState
 import com.example.scareme.profile.presentation.ProfileViewModel
@@ -37,6 +42,8 @@ val contentPadding  = PaddingValues(0.dp)
     val userViewModel : UserViewModel = viewModel(factory = UserViewModel.Factory)
     val profileViewModel : ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
    val showProfileViewModel : ShowProfileViewModel = viewModel(factory = ShowProfileViewModel.Factory)
+
+    val selectedItemIndex = NavigationState.selectedItemIndex
     NavHost(
         navController = navController,
         startDestination =  ScreenSplash
@@ -61,11 +68,19 @@ val contentPadding  = PaddingValues(0.dp)
                 contentPadding = contentPadding
             )
         }
+        composable<MessageNav> {
+
+            MessagingScreen(
+                viewModel = app.chatListViewModel,
+                retryAction = {}
+            )
+        }
         composable<TinderNav> {
             Scaffold (
                 bottomBar = {
                     BottomNavigationBar (
-                        onItemClick = { clickedIndex ->
+                        currentSelectedItemIndex = selectedItemIndex,
+                        onItemClick = { clickedIndex -> NavigationState.selectedItemIndex = clickedIndex
                             when(clickedIndex){
                                 0 -> {
                                     app.userViewModel.getUserDetails()
@@ -97,7 +112,8 @@ val contentPadding  = PaddingValues(0.dp)
             Scaffold (
                 bottomBar = {
                     BottomNavigationBar (
-                        onItemClick = { clickedIndex ->
+                        currentSelectedItemIndex = selectedItemIndex,
+                        onItemClick = { clickedIndex -> NavigationState.selectedItemIndex = clickedIndex
                             when(clickedIndex){
                                 0 -> {
                                     app.userViewModel.getUserDetails()
@@ -128,7 +144,8 @@ val contentPadding  = PaddingValues(0.dp)
             Scaffold (
                 bottomBar = {
                     BottomNavigationBar (
-                        onItemClick = { clickedIndex ->
+                        currentSelectedItemIndex = selectedItemIndex,
+                        onItemClick = { clickedIndex -> NavigationState.selectedItemIndex  = clickedIndex
                             when(clickedIndex){
                                 0 -> {
                                     app.userViewModel.getUserDetails()
@@ -150,6 +167,7 @@ val contentPadding  = PaddingValues(0.dp)
                 ChatListScreen(
                     viewModel = app.chatListViewModel,
                     retryAction = {  },
+                    navController = navController,
                     modifier = Modifier.padding(innerPadding)
                 )
 
@@ -177,3 +195,9 @@ object TinderNav
 object ShowProfileNav
 @Serializable
 object ChatListNav
+@Serializable
+object MessageNav
+
+object NavigationState {
+    var selectedItemIndex by mutableStateOf(0)
+}

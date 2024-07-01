@@ -11,7 +11,7 @@ data class ChatData(
 
 @Serializable
 data class Chat(
-    val id: String?,
+    val id: String,
     val title: String? = null,
     val avatar: String? = null
 )

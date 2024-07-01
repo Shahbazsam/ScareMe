@@ -67,7 +67,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
             Text(
                 modifier = Modifier
                     .size(width = 343.dp, height = 63.dp)
-                    .offset(y = 144.dp),
+                    .offset(y = 134.dp),
                 text = "Sign Up      ",
                 color = Color.White,
                 fontSize = 46.sp,
@@ -81,7 +81,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
                 isError = state.emailError != null,
                 modifier = Modifier
                     .size(width = 370.dp, height = 72.dp)
-                    .offset(y = 154.dp)
+                    .offset(y = 144.dp)
                     .fillMaxWidth(),
                 placeholder = {
                     Text(text = "E-mail")
@@ -103,6 +103,8 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
             )
             if(state.emailError != null){
                 Text(
+                    modifier = Modifier
+                        .offset(y = 144.dp),
                     text = state.emailError,
                     color =  Color(0xFFFFA500)
                 )
@@ -116,7 +118,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
             isError = state.passwordError != null,
             modifier = Modifier
                 .size(width = 370.dp, height = 72.dp)
-                .offset(y = 174.dp)
+                .offset(y = 154.dp)
                 .fillMaxWidth(),
             placeholder = {
                 Text(text = "Password")
@@ -138,11 +140,12 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
         )
         if(state.passwordError != null){
             Text(
+                modifier = Modifier
+                    .offset(y = 154.dp),
                 text = state.passwordError,
                 color =  Color(0xFFFFA500)
             )
         }
-        Spacer(modifier = Modifier.height(6.dp))
         OutlinedTextField(
             value = state.repeatedPassword ,
             onValueChange = {
@@ -151,7 +154,7 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
             isError = state.repeatedPasswordError != null,
             modifier = Modifier
                 .size(width = 370.dp, height = 72.dp)
-                .offset(y = 184.dp)
+                .offset(y = 164.dp)
                 .fillMaxWidth(),
             placeholder = {
                 Text(text = "Repeat Password")
@@ -173,18 +176,20 @@ fun AuthenticationScreen(modifier: Modifier = Modifier , navController: NavContr
         )
         if(state.repeatedPasswordError != null){
             Text(
+                modifier = Modifier
+                    .offset(y = 164.dp),
                 text = state.repeatedPasswordError,
                 color =  Color(0xFFFFA500)
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        //Spacer(modifier = Modifier.height(14.dp))
         Button(
             onClick = {
                     viewModel.onEvent(RegistrationFormEvent.Submit)
 
             },
             modifier = Modifier
-                .offset(y = 450.dp)
+                .offset(y = 430.dp)
                 .size(width = 370.dp, height = 64.dp)
                 .fillMaxWidth(),
             colors = ButtonDefaults.outlinedButtonColors( Color(0xFFFFA500)),

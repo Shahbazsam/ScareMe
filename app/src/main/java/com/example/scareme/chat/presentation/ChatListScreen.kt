@@ -3,6 +3,7 @@ package com.example.scareme.chat.presentation
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,8 +34,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.scareme.MessageNav
 import com.example.scareme.R
 import com.example.scareme.chat.data.model.ChatData
 
@@ -42,6 +45,7 @@ import com.example.scareme.chat.data.model.ChatData
 fun ChatListScreen(
     viewModel: ChatListViewModel,
     retryAction: () -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier
 ){
     val uiState by viewModel.chatUiState.collectAsState()
@@ -51,7 +55,7 @@ fun ChatListScreen(
     when(chatUiState){
         is ChatUiState.Loading -> ChatLoadingScreen(modifier = modifier.fillMaxSize())
         is ChatUiState.Success -> ChatListScreenImpl(
-            chatInformation =  chatUiState.chat, viewModel = viewModel ,  modifier = modifier.fillMaxWidth()
+            chatInformation =  chatUiState.chat,navController = navController , viewModel = viewModel ,  modifier = modifier.fillMaxWidth()
         )
         is ChatUiState.Error -> ChatErrorScreen(retryAction, modifier = modifier.fillMaxSize())
     }
@@ -89,6 +93,7 @@ fun ChatErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 fun ChatListScreenImpl(
     viewModel: ChatListViewModel,
+    navController: NavController,
     chatInformation : List<ChatData>,
     modifier: Modifier = Modifier
 ){
@@ -126,7 +131,7 @@ fun ChatListScreenImpl(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ){
             items(chatInformation){chatData ->
-                VerticalChatItem(chatData = chatData)
+                VerticalChatItem(chatData = chatData , navController = navController , viewModel = viewModel)
             }
 
         }
@@ -148,6 +153,7 @@ fun RowChatItem(chatData: ChatData) {
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
+                .clickable {  }
                 .size(64.dp)
                 .clip(CircleShape)
         )
@@ -167,11 +173,18 @@ fun RowChatItem(chatData: ChatData) {
 
 @Composable
 fun VerticalChatItem(
+    viewModel: ChatListViewModel,
+    navController: NavController,
     chatData: ChatData
 ){
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .clickable {
+                chatData.chat?.let { viewModel.onCall(it.id, it?.title , it?.avatar) }
+                navController.navigate(MessageNav)
+            }
+            .fillMaxWidth()
     ){
         AsyncImage(
             model = ImageRequest.Builder(context = LocalContext.current)
@@ -191,6 +204,7 @@ fun VerticalChatItem(
         Column {
             chatData.chat?.title?.let {
                 Text(
+
                     text = it,
 
                     )
