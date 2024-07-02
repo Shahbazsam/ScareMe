@@ -133,6 +133,8 @@ val contentPadding  = PaddingValues(0.dp)
                 }
             ){innerPadding ->
                ShowProfileScreen(
+                   navController = navController,
+                   ProViewModel = app.profileViewModel,
                    viewModel = app.showProfileViewModel,
                    retryAction = {} ,
                    modifier = Modifier.padding(innerPadding)

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -24,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,8 +49,10 @@ import com.alexstyl.swipeablecard.ExperimentalSwipeableCardApi
 import com.alexstyl.swipeablecard.rememberSwipeableCardState
 import com.alexstyl.swipeablecard.swipableCard
 import com.example.scareme.R
+import com.example.scareme.ui.theme.textColor
 import com.example.scareme.userScreen.data.model.UserData
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 
 @Composable
@@ -138,11 +142,11 @@ fun SwipeUserScreen(
                 Text(
                     text = "Trick or Treat?",
                     fontSize = 36.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.ExtraBold,
                     color = Color.White,
                     modifier = Modifier
                         .align(Alignment.Start)
-                        .offset(x = 21.dp, y = 47.dp)
+                        .offset(x = 16.dp, y = 64.dp)
                         .padding(start = 12.dp, bottom = 12.dp)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -292,21 +296,42 @@ fun ProfileCard(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
             )
-            Column(Modifier.align(Alignment.BottomStart)) {
+            val randomNumber = remember { generateRandomNumber() }
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .fillMaxWidth()
+                    .height(68.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(textColor),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 if (name != null) {
                     Text(
                         text = name,
-                        color = Color.White,
+                        modifier = Modifier.padding(start = 8.dp),
                         fontSize = 22.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(10.dp)
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
                     )
                 }
+                Text(
+                    text = "$randomNumber Matches ",
+                    modifier = Modifier.padding(end = 8.dp),
+                    color = Color(0xFFFF6921D),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
 }
 
+fun generateRandomNumber(): Int {
+    return Random.nextInt(0, 11)
+}
 
 
 @Preview(showBackground = true)

@@ -13,6 +13,7 @@ import com.example.scareme.chat.data.ChatRepository
 import com.example.scareme.chat.data.model.ChatData
 import com.example.scareme.chat.data.model.Messages
 import com.example.scareme.chat.data.model.PhotoData
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -52,6 +53,17 @@ class ChatListViewModel(
         this.token = token
         viewModelScope.launch {
             getChatList()
+        }
+    }
+    init {
+        // Start a coroutine to periodically fetch chat list when token is available
+        viewModelScope.launch {
+            while (true) {
+                if (token.isNotEmpty()) {
+                    getChatList()
+                }
+                delay(30000) // Delay for 30 seconds
+            }
         }
     }
     fun onEvent(event: MessageEvent){

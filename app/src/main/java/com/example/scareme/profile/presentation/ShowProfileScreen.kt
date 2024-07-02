@@ -42,16 +42,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.scareme.ProfileInputScreen
 import com.example.scareme.R
 import com.example.scareme.profile.data.model.Topics
 import com.example.scareme.profile.data.model.UserInformation
+import kotlinx.coroutines.runBlocking
 
 
 @Composable
 fun ShowProfileScreen(
     viewModel: ShowProfileViewModel,
+    ProViewModel : ProfileViewModel,
+    navController: NavController,
     retryAction: () -> Unit,
     modifier: Modifier = Modifier
 ){
@@ -65,7 +70,7 @@ fun ShowProfileScreen(
     when(showProfileUiState){
         is ShowProfileUiState.Loading -> LoadingProfileScreen(modifier = modifier.fillMaxSize())
         is ShowProfileUiState.Success -> SuccessScreen(
-           userInformation =  showProfileUiState.userInformation,  modifier = modifier.fillMaxWidth()
+           userInformation =  showProfileUiState.userInformation,navController , ProViewModel,  modifier = modifier.fillMaxWidth()
         )
         is ShowProfileUiState.Error -> ErrorProfileScreen(retryAction, modifier = modifier.fillMaxSize())
     }
@@ -101,7 +106,7 @@ fun ErrorProfileScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
 
 
 @Composable
-fun SuccessScreen(userInformation: UserInformation, modifier: Modifier = Modifier){
+fun SuccessScreen(userInformation: UserInformation, navController: NavController, ProViewModel: ProfileViewModel,modifier: Modifier = Modifier){
 
     val user = userInformation
     Column(modifier = Modifier
@@ -125,6 +130,9 @@ fun SuccessScreen(userInformation: UserInformation, modifier: Modifier = Modifie
             user?.let {
                 AsyncImage(
                     modifier = Modifier
+                        .clickable {
+                                navController.navigate(ProfileInputScreen)
+                             }
                         .size(200.dp)
                         .clip(CircleShape)
                         .border(2.dp, Color.White, CircleShape),
@@ -243,10 +251,11 @@ fun TopicButtons(topicTitle: String) {
 }
 
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     SuccessScreen(
+
         userInformation =
             UserInformation(
                 userId = "hhgghhhg",
@@ -260,4 +269,4 @@ fun DefaultPreview() {
                 )
             )
         )
-}
+}*/
