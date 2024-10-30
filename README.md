@@ -24,7 +24,7 @@ Below are some screenshots illustrating the main features of the app:
 
 ### Sign-Up Page
 ![Sign Up](https://github.com/user-attachments/assets/0b751cb7-59bb-44b1-abd9-4402e53ad86c)
-*Users can create an account by providing their details and uploading a photo.*
+*Users can create an account by providing their details.*
 
 ### Sign-In Page
 ![Sign In](https://github.com/user-attachments/assets/71befa86-2b38-4bba-8fd9-edde155bb4c2)
